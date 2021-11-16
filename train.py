@@ -37,7 +37,7 @@ from timm.optim import create_optimizer_v2, optimizer_kwargs
 from timm.scheduler import create_scheduler
 from timm.utils import ApexScaler, NativeScaler
 
-CUDA_LAUNCH_BLOCKING=1
+CUDA_LAUNCH_BLOCKING="1"
 
 try:
     from apex import amp
