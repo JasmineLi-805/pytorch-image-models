@@ -6,7 +6,7 @@ import timm
 
 from .registry import register_model
 
-__all__ = ['ScResnet']  # model_registry will add each entrypoint fn to this
+# __all__ = ['ScResnet']  # model_registry will add each entrypoint fn to this
 
 def gumbel_softmax(x):
     # TODO: Implement Gumbel-Softmax
