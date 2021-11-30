@@ -33,6 +33,7 @@ from .resnest import *
 from .resnet import *
 from .resnetv2 import *
 from .rexnet import *
+from .scresnet import *
 from .selecsls import *
 from .senet import *
 from .sknet import *
