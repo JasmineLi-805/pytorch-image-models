@@ -25,6 +25,7 @@ class ScResnet(nn.Module):
     def __init__(self, classifier='resnet18', num_classes=1000, in_chans=3) -> None:
         super().__init__()
         self.resnet = create_model(classifier)
+        self.num_classes=num_classes
 
     def forward(self, x):
         x = self.resnet(x)
