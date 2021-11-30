@@ -25,5 +25,5 @@ class ScResnet(nn.Module):
         return x
 
 @register_model
-def scresnet():
+def scresnet(pretrained=False, **kwargs):
     return ScResnet()
