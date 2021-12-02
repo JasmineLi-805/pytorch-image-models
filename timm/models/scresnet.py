@@ -22,7 +22,7 @@ def saliency():
     pass
 
 class ScResnet(nn.Module):
-    def __init__(self, classifier='resnet18', num_classes=1000, in_chans=3) -> None:
+    def __init__(self, classifier='resnet18', num_classes=1000) -> None:
         super().__init__()
         self.resnet = create_model(classifier)
         self.num_classes=num_classes
@@ -32,5 +32,5 @@ class ScResnet(nn.Module):
         return x
 
 @register_model
-def scresnet(pretrained=False, **kwargs):
+def scresnet(**kwargs):
     return ScResnet()
