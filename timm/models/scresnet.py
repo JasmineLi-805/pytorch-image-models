@@ -78,4 +78,4 @@ class ScResnet(nn.Module):
 @register_model
 def scresnet(**kwargs):
     pretrained = False
-    return build_model_with_cfg(ScResnet, 'scresnet', False, default_cfg)
+    return build_model_with_cfg(ScResnet, 'scresnet', pretrained, **default_cfg)
