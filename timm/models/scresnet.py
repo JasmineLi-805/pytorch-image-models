@@ -12,17 +12,21 @@ from timm.data import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 
 default_cfg = {
     'num_classes': 1000,
-    'downsample_size': (1, 128, 128),
-    'original_size': (3, 224, 224),
+    'input_size': (4, 32, 32), 
+    'crop_pct': 1.0, 'interpolation': 'bicubic',
+    'mean': IMAGENET_DEFAULT_MEAN, 'std': IMAGENET_DEFAULT_STD,
+}
+model_cfg = {
     'SC_layers': [
         # in_chan, out_chan, kernel_size, stride, activation
         [ 1,  8, 3, 2, 'relu6'],
         [ 8, 16, 3, 2, 'relu6'],
         [16, 32, 3, 2, 'relu6']
     ],
-    'input_size': (4, 32, 32), 
-    'crop_pct': 1.0, 'interpolation': 'bicubic',
-    'mean': IMAGENET_DEFAULT_MEAN, 'std': IMAGENET_DEFAULT_STD,
+    'downsample_size': (1, 32, 32),
+    'original_size': (3, 32, 32),
+    'num_classes': default_cfg['num_classes'],
+    'classifier': 'resnet18'
 }
 
 def gumbel_softmax(x):
@@ -79,7 +83,7 @@ class ScLayer(nn.Module):
 
 class ScResnet(nn.Module):
     def __init__(self, original_size, downsample_size, SC_layers,
-                 classifier='resnet18', num_classes=1000, input_size=None) -> None:
+                 classifier='resnet18', num_classes=1000) -> None:
         super().__init__()
         self.down_size = downsample_size
         self.orig_size = original_size
@@ -96,4 +100,4 @@ class ScResnet(nn.Module):
 @register_model
 def scresnet(**kwargs):
     pretrained = False
-    return build_model_with_cfg(ScResnet, 'scresnet', pretrained, default_cfg, **default_cfg)
+    return build_model_with_cfg(ScResnet, 'scresnet', pretrained, default_cfg, **model_cfg)
