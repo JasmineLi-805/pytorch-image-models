@@ -33,6 +33,7 @@ def calc_conv_out_dim(in_dim, kernel, stride):
 
 class ScLayer(nn.Module):
     def __init__(self, cfg, input_size):
+        super().__init__()
         c, h, w = input_size
         block_list = []
         for layer_cfg in cfg:
