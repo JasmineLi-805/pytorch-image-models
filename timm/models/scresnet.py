@@ -32,10 +32,6 @@ model_cfg = {
     'classifier': 'resnet18'
 }
 
-def gumbel_softmax(x):
-    # TODO: Implement Gumbel-Softmax
-    pass
-
 def calc_conv_out_dim(in_dim, kernel, stride):
     out_dim = in_dim - (kernel - 1) - 1
     out_dim = 1.0 * out_dim / stride
@@ -68,9 +64,7 @@ class ScLayer(nn.Module):
             w = calc_conv_out_dim(w, layer_cfg[2], layer_cfg[3])
         self.blocks = nn.Sequential(*block_list)
         self.fc = nn.Linear(c * h * w, 1)
-        # TODO: switch to Gumbel softmax
-        self.softmax = nn.Softmax(dim=1)
-    
+
     def forward(self, x):
         # x: (batch, crop_n, channel, height, width)
         batch_size = x.shape[0]
@@ -80,8 +74,7 @@ class ScLayer(nn.Module):
         x = x.view(x.shape[0], -1)
         x = self.fc(x)
         x = x.view(batch_size, n)
-        # TODO: apply gumbel softmax
-        x = self.softmax(x)
+        x = F.gumbel_softmax(x, dim=1)
         return x
 
 class ScResnet(nn.Module):
