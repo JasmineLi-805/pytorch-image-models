@@ -6,6 +6,7 @@ from .resnet import resnet18
 from .factory import create_model
 from .registry import register_model
 from .helpers import build_model_with_cfg
+from timm.data import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 
 # __all__ = ['ScResnet']  # model_registry will add each entrypoint fn to this
 
@@ -18,7 +19,10 @@ default_cfg = {
         [ 1,  8, 3, 2, 'relu6'],
         [ 8, 16, 3, 2, 'relu6'],
         [16, 32, 3, 2, 'relu6']
-    ]
+    ],
+    'input_size': (4, 32, 32), 
+    'crop_pct': 1.0, 'interpolation': 'bicubic',
+    'mean': IMAGENET_DEFAULT_MEAN, 'std': IMAGENET_DEFAULT_STD,
 }
 
 def gumbel_softmax(x):
