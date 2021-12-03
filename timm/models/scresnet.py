@@ -13,6 +13,7 @@ from timm.data import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 default_cfg = {
     'num_classes': 1000,
     'input_size': (4, 32, 32), 
+    # below only needed with using with prefetcher.
     # 'crop_pct': 1.0, 'interpolation': 'bicubic',
     # 'mean': IMAGENET_DEFAULT_MEAN, 'std': IMAGENET_DEFAULT_STD,
     # 'mean': (0, 0, 0, 0),
@@ -91,12 +92,32 @@ class ScResnet(nn.Module):
         self.orig_size = original_size
         self.num_classes=num_classes
 
-        self.saliency_map = ScLayer(SC_layers, self.down_size)
-        self.resnet = create_model(classifier)
+        self.salience_map = ScLayer(SC_layers, self.down_size)
+        self.resnet = create_model(classifier, in_chans=original_size[0])
+
+        self.is_training = True
 
     def forward(self, x):
+        # x -> (batch, n_crop, chan=4, H, W)
         print(f'the shape of input img={x.shape}')
-        x = self.resnet(x)
+        x = torch.permute(x, (2, 0, 1, 3, 4))
+        # x -> (chan=4, batch, n_crop, H, W)
+        assert x.shape[0] == 4
+        x_sc = x[3]     # (chan=1, batch, n_crop, H, W)
+        x_cls = x[:3]   # (chan=3, batch, n_crop, H, W)
+        x_sc = torch.permute(x_sc, (1, 2, 0, 3, 4)) # (batch, n_crop, chan=1, H, W)
+        x_cls = torch.permute(x_cls, (1, 2, 0, 3, 4)) # (batch, n_crop, chan=3, H, W)
+
+        x_sc = self.salience_map(x_sc)  # (batch, n_crop)
+        if self.is_training:
+            x_sc = x_sc.view(x_sc.shape[0], x_sc.shape[1], 1, 1, 1)
+            x_cls = x_cls * x_sc
+            x_cls = torch.sum(x_cls, dim=1)
+        else:
+            x_sc = torch.argmax(x_sc, dim=1)
+            x_cls = torch.index_select(x_cls, dim=1, index=x_sc)
+        assert x_cls.shape[1:] == self.orig_size
+        x = self.resnet(x_cls)
         return x
 
 @register_model
