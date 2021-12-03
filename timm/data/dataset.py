@@ -162,6 +162,7 @@ class SalienceImageDataset(ImageDataset):
     def __init__(self, root, parser=None, class_map=None, load_bytes=False, transform=None, target_transform=None):
         super().__init__(root, parser=parser, class_map=class_map, load_bytes=load_bytes, transform=transform, target_transform=target_transform)
         self.downsize_transform = transforms.Compose([
+            transforms.ToPILImage(),
             transforms.FiveCrop(112),   # outputs PIL img
             transforms.Lambda(lambda images: [transforms.Resize(32, interpolation=InterpolationMode.BICUBIC)(img) for img in images]),
             transforms.Lambda(lambda images: [transforms.Grayscale(num_output_channels=1)(img) for img in images]),
@@ -169,6 +170,7 @@ class SalienceImageDataset(ImageDataset):
             transforms.Lambda(lambda crops: torch.stack([transforms.ToTensor()(crop) for crop in crops])) # returns a 4D tensor
         ])
         self.original_transform = transforms.Compose([
+            transforms.ToPILImage(),
             transforms.FiveCrop(112),   # outputs PIL img
             transforms.Lambda(lambda crops: torch.stack([transforms.ToTensor()(crop) for crop in crops])) # returns a 4D tensor
         ])
