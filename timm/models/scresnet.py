@@ -103,7 +103,7 @@ class ScResnet(nn.Module):
         x = torch.permute(x, (2, 0, 1, 3, 4))
         # x -> (chan=4, batch, n_crop, H, W)
         assert x.shape[0] == 4
-        x_sc = x[3]     # (chan=1, batch, n_crop, H, W)
+        x_sc = x[3].unsqueeze(dim=0)     # (chan=1, batch, n_crop, H, W)
         x_cls = x[:3]   # (chan=3, batch, n_crop, H, W)
         x_sc = torch.permute(x_sc, (1, 2, 0, 3, 4)) # (batch, n_crop, chan=1, H, W)
         x_cls = torch.permute(x_cls, (1, 2, 0, 3, 4)) # (batch, n_crop, chan=3, H, W)
