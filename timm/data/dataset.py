@@ -165,6 +165,7 @@ class SalienceImageDataset(ImageDataset):
             transforms.FiveCrop(112),   # outputs PIL img
             transforms.Lambda(lambda images: [transforms.Resize(32, interpolation=InterpolationMode.BICUBIC)(img) for img in images]),
             transforms.Lambda(lambda images: [transforms.Grayscale(num_output_channels=1)(img) for img in images]),
+            transforms.Lambda(lambda images: [transforms.Pad([0, 0, 112-32, 112-32])(img) for img in images]),
             transforms.Lambda(lambda crops: torch.stack([transforms.ToTensor()(crop) for crop in crops])) # returns a 4D tensor
         ])
         self.original_transform = transforms.Compose([
@@ -175,6 +176,9 @@ class SalienceImageDataset(ImageDataset):
     def __getitem__(self, index):
         img, target = super().__getitem__(index)
         downsize_crop = self.downsize_transform(img)
+        downsize_crop = torch.permute(downsize_crop, (1, 0, 2, 3))
         original_crop = self.original_transform(img)
-        img = (downsize_crop, original_crop)
+        original_crop = torch.permute(original_crop, (1, 0, 2, 3))
+        img = torch.cat((downsize_crop, original_crop), dim=0)
+        img = torch.permute(original_crop, (1, 0, 2, 3))
         return img, target
