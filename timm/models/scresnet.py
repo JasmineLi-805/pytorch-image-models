@@ -45,7 +45,7 @@ class ScLayer(nn.Module):
             bn = nn.BatchNorm2d(layer_cfg[1])
             act = None
             if layer_cfg[4] == 'relu6':
-                act = nn.Relu6()
+                act = nn.ReLU6()
             # append the layers
             block_list.append(conv)
             block_list.append(bn)
@@ -79,7 +79,7 @@ class ScResnet(nn.Module):
         self.down_size = downsample_size
         self.orig_size = original_size
         self.num_classes=num_classes
-        
+
         self.saliency_map = ScLayer(SC_layers, self.down_size)
         self.resnet = create_model(classifier)
 
