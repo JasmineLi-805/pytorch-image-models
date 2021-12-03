@@ -190,9 +190,11 @@ class SalienceImageDataset(ImageDataset):
                 raise e
         downsize_crop = self.downsize_transform(img)
         downsize_crop = torch.permute(downsize_crop, (1, 0, 2, 3))
+        print(f'down img shape={downsize_crop.shape}')
         original_crop = self.original_transform(img)
         original_crop = torch.permute(original_crop, (1, 0, 2, 3))
+        print(f'orig img shape={original_crop.shape}')
         img = torch.cat((downsize_crop, original_crop), dim=0)
-        img = torch.permute(original_crop, (1, 0, 2, 3))
+        img = torch.permute(img, (1, 0, 2, 3))
         # img = img.view(img.shape[0]*img.shape[1], img.shape[2], img.shape[3])
         return img, target
