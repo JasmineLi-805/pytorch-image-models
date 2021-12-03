@@ -85,6 +85,7 @@ class ScResnet(nn.Module):
         self.resnet = create_model(classifier)
 
     def forward(self, x):
+        print(f'the shape of input img={x.shape}')
         x = self.resnet(x)
         return x
 
