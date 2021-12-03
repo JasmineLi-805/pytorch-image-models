@@ -56,20 +56,32 @@ class ScLayer(nn.Module):
             w = calc_conv_out_dim(w, layer_cfg[2], layer_cfg[3])
         self.blocks = nn.Sequential(*block_list)
         self.fc = nn.Linear(c * h * w, 1)
+        # TODO: switch to Gumbel softmax
+        self.softmax = nn.Softmax(dim=1)
     
     def forward(self, x):
-        # x: (batch, channel, height, width)
+        # x: (batch, crop_n, channel, height, width)
+        batch_size = x.shape[0]
+        n = x.shape[1]
+        x = x.view(batch_size * n, x.shape[2], x.shape[3], x.shape[4])
         x = self.blocks(x)
         x = x.view(x.shape[0], -1)
         x = self.fc(x)
+        x = x.view(batch_size, n)
+        # TODO: apply gumbel softmax
+        x = self.softmax(x)
         return x
 
 class ScResnet(nn.Module):
     def __init__(self, original_size, downsample_size, SC_layers,
                  classifier='resnet18', num_classes=1000) -> None:
         super().__init__()
-        self.resnet = create_model(classifier)
+        self.down_size = downsample_size
+        self.orig_size = original_size
         self.num_classes=num_classes
+        
+        self.saliency_map = ScLayer(SC_layers, self.down_size)
+        self.resnet = create_model(classifier)
 
     def forward(self, x):
         x = self.resnet(x)
@@ -78,4 +90,4 @@ class ScResnet(nn.Module):
 @register_model
 def scresnet(**kwargs):
     pretrained = False
-    return build_model_with_cfg(ScResnet, 'scresnet', pretrained,default_cfg, **default_cfg)
+    return build_model_with_cfg(ScResnet, 'scresnet', pretrained, default_cfg, **default_cfg)
