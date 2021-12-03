@@ -13,10 +13,10 @@ from timm.data import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 default_cfg = {
     'num_classes': 1000,
     'input_size': (4, 32, 32), 
-    'crop_pct': 1.0, 'interpolation': 'bicubic',
+    # 'crop_pct': 1.0, 'interpolation': 'bicubic',
     # 'mean': IMAGENET_DEFAULT_MEAN, 'std': IMAGENET_DEFAULT_STD,
-    'mean': (0, 0, 0, 0),
-    'std': (1, 1, 1, 1)
+    # 'mean': (0, 0, 0, 0),
+    # 'std': (1, 1, 1, 1)
 }
 model_cfg = {
     'SC_layers': [
