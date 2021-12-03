@@ -8,7 +8,7 @@ try:
 except ImportError:
     has_inaturalist = False
 
-from .dataset import IterableImageDataset, ImageDataset
+from .dataset import IterableImageDataset, ImageDataset, SalienceImageDataset
 
 _TORCH_BASIC_DS = dict(
     cifar10=CIFAR10,
@@ -125,11 +125,16 @@ def create_dataset(
         ds = IterableImageDataset(
             root, parser=name, split=split, is_training=is_training,
             download=download, batch_size=batch_size, repeats=repeats, **kwargs)
+    elif name == 'scimagedataset':
+        if search_split and os.path.isdir(root):
+            # look for split specific sub-folder in root
+            root = _search_split(root, split)
+        print(f'Using the SalienceImageDataset.')
+        ds = SalienceImageDataset(root, parser=name, class_map=class_map, load_bytes=load_bytes, **kwargs)
     else:
         # FIXME support more advance split cfg for ImageFolder/Tar datasets in the future
         if search_split and os.path.isdir(root):
             # look for split specific sub-folder in root
             root = _search_split(root, split)
-        print(f'the dataset name is {name}')
         ds = ImageDataset(root, parser=name, class_map=class_map, load_bytes=load_bytes, **kwargs)
     return ds
