@@ -161,19 +161,19 @@ Additional Dataset type for SalienceMap+Classification model
 class SalienceImageDataset(ImageDataset):
     def __init__(self, root, parser=None, class_map=None, load_bytes=False, transform=None, target_transform=None):
         super().__init__(root, parser=parser, class_map=class_map, load_bytes=load_bytes, transform=transform, target_transform=target_transform)
-        self.crop_size = 32
-        self.ssize = 32
+        self.small_size = 32
+        self.large_size = 112
         self.downsize_transform = transforms.Compose([
-            transforms.Resize(64),
-            transforms.FiveCrop(self.crop_size),   # outputs PIL img
-            transforms.Lambda(lambda images: [transforms.Resize(self.ssize, interpolation=InterpolationMode.BICUBIC)(img) for img in images]),
+            transforms.Resize(224),
+            transforms.FiveCrop(self.large_size),   # outputs PIL img
+            transforms.Lambda(lambda images: [transforms.Resize(self.small_size, interpolation=InterpolationMode.BICUBIC)(img) for img in images]),
             transforms.Lambda(lambda images: [transforms.Grayscale(num_output_channels=1)(img) for img in images]),
-            transforms.Lambda(lambda images: [transforms.Pad([0, 0, self.crop_size-self.ssize, self.crop_size-self.ssize])(img) for img in images]),
+            transforms.Lambda(lambda images: [transforms.Pad([0, 0, self.large_size-self.small_size, self.large_size-self.small_size])(img) for img in images]),
             transforms.Lambda(lambda crops: torch.stack([transforms.ToTensor()(crop) for crop in crops])) # returns a 4D tensor
         ])
         self.original_transform = transforms.Compose([
-            transforms.Resize(64),
-            transforms.FiveCrop(self.crop_size),   # outputs PIL img
+            transforms.Resize(224),
+            transforms.FiveCrop(self.large_size),   # outputs PIL img
             transforms.Lambda(lambda crops: torch.stack([transforms.ToTensor()(crop) for crop in crops])) # returns a 4D tensor
         ])
 
@@ -188,11 +188,12 @@ class SalienceImageDataset(ImageDataset):
                 return self.__getitem__((index + 1) % len(self.parser))
             else:
                 raise e
+        # ori_img = img
         downsize_crop = self.downsize_transform(img)
         downsize_crop = torch.permute(downsize_crop, (1, 0, 2, 3))
         original_crop = self.original_transform(img)
         original_crop = torch.permute(original_crop, (1, 0, 2, 3))
-        img = torch.cat((downsize_crop, original_crop), dim=0)
+        img = torch.cat((original_crop,downsize_crop), dim=0)
         img = torch.permute(img, (1, 0, 2, 3))
         # img = img.view(img.shape[0]*img.shape[1], img.shape[2], img.shape[3])
         return img, target

@@ -27,7 +27,7 @@ model_cfg = {
         [16, 32, 3, 2, 'relu6']
     ],
     'downsample_size': (1, 32, 32),
-    'original_size': (3, 32, 32),
+    'original_size': (3, 224, 224),
     'num_classes': default_cfg['num_classes'],
     'classifier': 'resnet18'
 }
@@ -90,6 +90,14 @@ class ScResnet(nn.Module):
 
         self.is_training = True
 
+    def eval(self):
+        self.is_training = False
+        return super().eval()
+    
+    def train(self, mode: bool = True):
+        self.is_training = True
+        return super().train(mode=mode)
+
     def forward(self, x):
         # x -> (batch, n_crop, chan=4, H, W)
         # print(f'the shape of input img={x.shape}')
@@ -99,6 +107,7 @@ class ScResnet(nn.Module):
         x_sc = x[3].unsqueeze(dim=0)     # (chan=1, batch, n_crop, H, W)
         x_cls = x[:3]   # (chan=3, batch, n_crop, H, W)
         x_sc = torch.permute(x_sc, (1, 2, 0, 3, 4)) # (batch, n_crop, chan=1, H, W)
+        x_sc = x_sc[:, :, :self.down_size[0], :self.down_size[1], :self.down_size[2]]   # remove the padded region
         x_cls = torch.permute(x_cls, (1, 2, 0, 3, 4)) # (batch, n_crop, chan=3, H, W)
 
         x_sc = self.salience_map(x_sc)  # (batch, n_crop)
