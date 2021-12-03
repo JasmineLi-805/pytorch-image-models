@@ -99,7 +99,7 @@ class ScResnet(nn.Module):
 
     def forward(self, x):
         # x -> (batch, n_crop, chan=4, H, W)
-        print(f'the shape of input img={x.shape}')
+        # print(f'the shape of input img={x.shape}')
         x = torch.permute(x, (2, 0, 1, 3, 4))
         # x -> (chan=4, batch, n_crop, H, W)
         assert x.shape[0] == 4
