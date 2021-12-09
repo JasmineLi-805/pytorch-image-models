@@ -12,7 +12,7 @@ from timm.data import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 
 default_cfg = {
     'num_classes': 1000,
-    'input_size': (4, 224, 224), 
+    'input_size': (4, 112, 112), 
     # below only needed with using with prefetcher.
     # 'crop_pct': 1.0, 'interpolation': 'bicubic',
     # 'mean': IMAGENET_DEFAULT_MEAN, 'std': IMAGENET_DEFAULT_STD,
@@ -27,7 +27,7 @@ model_cfg = {
         [16, 32, 3, 2, 'relu6']
     ],
     'downsample_size': (1, 32, 32),
-    'original_size': (3, 224, 224),
+    'original_size': (3, 112, 112),
     'num_classes': default_cfg['num_classes'],
     'classifier': 'resnet18'
 }
