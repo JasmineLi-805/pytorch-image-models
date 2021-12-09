@@ -178,6 +178,7 @@ class SalienceImageDataset(ImageDataset):
         ])
 
     def __getitem__(self, index):
+        print(f'getting item from SalienceImageDataset')
         img, target = self.parser[index]
         try:
             img = img.read() if self.load_bytes else Image.open(img).convert('RGB')
