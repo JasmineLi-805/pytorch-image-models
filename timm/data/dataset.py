@@ -195,5 +195,6 @@ class SalienceImageDataset(ImageDataset):
         original_crop = torch.permute(original_crop, (1, 0, 2, 3))
         img = torch.cat((original_crop,downsize_crop), dim=0)
         img = torch.permute(img, (1, 0, 2, 3))
+        print(f'dataset out img shape={img.shape}')
         # img = img.view(img.shape[0]*img.shape[1], img.shape[2], img.shape[3])
         return img, target
