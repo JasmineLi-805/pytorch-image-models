@@ -125,7 +125,9 @@ class ScResnet(nn.Module):
         x_sc = torch.argmax(x_sc, dim=1)
         stack = []
         for i in range(x_sc.shape[0]):
-            stack.append(torch.index_select(x_cls[i], dim=0, index=x_sc[i]))
+            img = torch.index_select(x_cls[i], dim=0, index=x_sc[i])
+            img = torch.squeeze(img)
+            stack.append(img)
         x_cls = torch.stack(stack, dim=0)
         print(x_cls.shape)
         assert x_cls.shape[1:] == self.orig_size
