@@ -112,24 +112,15 @@ class ScResnet(nn.Module):
 
         x_sc = self.salience_map(x_sc)  # (batch, n_crop)
         # if self.is_training:
-        #     x_sc = x_sc.view(x_sc.shape[0], x_sc.shape[1], 1, 1, 1)
-        #     x_cls = x_cls * x_sc
-        #     x_cls = torch.sum(x_cls, dim=1)
-        #     # print(f'in training shape={x_cls.shape}')
+        x_sc = x_sc.view(x_sc.shape[0], x_sc.shape[1], 1, 1, 1)
+        x_cls = x_cls * x_sc
+        x_cls = torch.sum(x_cls, dim=1)
+        # print(f'in training shape={x_cls.shape}')
         # else:
         #     x_sc = torch.argmax(x_sc, dim=1)
         #     x_cls = torch.index_select(x_cls, dim=1, index=x_sc)
         #     # print(f'in validation shape={x_cls.shape}')
-        print('-----------')
-        print(x_cls.shape)
-        x_sc = torch.argmax(x_sc, dim=1)
-        stack = []
-        for i in range(x_sc.shape[0]):
-            img = torch.index_select(x_cls[i], dim=0, index=x_sc[i])
-            img = torch.squeeze(img)
-            stack.append(img)
-        x_cls = torch.stack(stack, dim=0)
-        print(x_cls.shape)
+        # print(x_cls.shape)
         assert x_cls.shape[1:] == self.orig_size
         x = self.resnet(x_cls)
         return x
