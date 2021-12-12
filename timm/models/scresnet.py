@@ -26,7 +26,7 @@ model_cfg = {
         [ 8, 16, 3, 2, 'relu6'],
         [16, 32, 3, 2, 'relu6']
     ],
-    'downsample_size': (1, 224, 224),
+    'downsample_size': (1, 128, 128),
     'original_size': (3, 224, 224),
     'num_classes': default_cfg['num_classes'],
     'classifier': 'resnet18'
