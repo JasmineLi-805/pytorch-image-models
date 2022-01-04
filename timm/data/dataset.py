@@ -163,8 +163,18 @@ class SalienceImageDataset(ImageDataset):
         super().__init__(root, parser=parser, class_map=class_map, load_bytes=load_bytes, transform=transform, target_transform=target_transform)
         self.small_size = 64
         self.large_size = 224
+        self.downsize = transforms.Compose([
+            transforms.Resize((self.small_size, self.small_size)),
+            transforms.Grayscale(num_output_channels=1),
+            transforms.Pad([0, 0, self.large_size-self.small_size, self.large_size-self.small_size]),
+            transforms.ToTensor()
+        ])
+        self.original = transforms.Compose([
+            transforms.Resize((self.large_size, self.large_size)),
+            transforms.ToTensor()
+        ])
         self.downsize_transform = transforms.Compose([
-            transforms.Resize(336),
+            transforms.Resize((336, 336)),
             transforms.FiveCrop(self.large_size),   # outputs PIL img
             transforms.Lambda(lambda images: [transforms.Resize(self.small_size, interpolation=InterpolationMode.BICUBIC)(img) for img in images]),
             transforms.Lambda(lambda images: [transforms.Grayscale(num_output_channels=1)(img) for img in images]),
@@ -172,7 +182,7 @@ class SalienceImageDataset(ImageDataset):
             transforms.Lambda(lambda crops: torch.stack([transforms.ToTensor()(crop) for crop in crops])) # returns a 4D tensor
         ])
         self.original_transform = transforms.Compose([
-            transforms.Resize(336),
+            transforms.Resize((336, 336)),
             transforms.FiveCrop(self.large_size),   # outputs PIL img
             transforms.Lambda(lambda crops: torch.stack([transforms.ToTensor()(crop) for crop in crops])) # returns a 4D tensor
         ])
@@ -189,10 +199,19 @@ class SalienceImageDataset(ImageDataset):
                 return self.__getitem__((index + 1) % len(self.parser))
             else:
                 raise e
-        # ori_img = img
-        downsize_crop = self.downsize_transform(img)
+        ds_nocrop = self.downsize(img)
+        ds_nocrop = torch.unsqueeze(ds_nocrop, 0)   # torch.Size([1, 1, 224, 224])
+
+        ori_nocrop = self.original(img)
+        ori_nocrop = torch.unsqueeze(ori_nocrop, 0) # torch.Size([1, 3, 224, 224])
+        
+        downsize_crop = self.downsize_transform(img)    # torch.Size([5, 1, 224, 224])
+        downsize_crop = torch.cat((ds_nocrop, downsize_crop), dim=0)    # torch.Size([6, 1, 224, 224])
+
+        original_crop = self.original_transform(img)    # torch.Size([5, 3, 224, 224])
+        original_crop = torch.cat((ori_nocrop, original_crop), dim=0)   # torch.Size([6, 3, 224, 224])
+
         downsize_crop = torch.permute(downsize_crop, (1, 0, 2, 3))
-        original_crop = self.original_transform(img)
         original_crop = torch.permute(original_crop, (1, 0, 2, 3))
         img = torch.cat((original_crop,downsize_crop), dim=0)
         img = torch.permute(img, (1, 0, 2, 3))
