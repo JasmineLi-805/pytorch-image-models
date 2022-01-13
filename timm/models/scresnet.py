@@ -120,7 +120,7 @@ class ScResnet(nn.Module):
             print('eval')
             x_sc = torch.argmax(x_sc, dim=1)
             x_cls = torch.index_select(x_cls, dim=1, index=x_sc)
-            # print(f'in validation shape={x_cls.shape}')
+            print(f'in validation shape={x_cls.shape}')
         assert x_cls.shape[1:] == self.orig_size
         x = self.resnet(x_cls)
         return x
