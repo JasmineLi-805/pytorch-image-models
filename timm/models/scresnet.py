@@ -90,13 +90,13 @@ class ScResnet(nn.Module):
 
         self.is_training = True
 
-    def eval(self):
-        self.is_training = False
-        return super().eval()
+    # def eval(self):
+    #     self.is_training = False
+    #     return super().eval()
     
-    def train(self, mode: bool = True):
-        self.is_training = True
-        return super().train(mode=mode)
+    # def train(self, mode: bool = True):
+    #     self.is_training = mode
+    #     return super().train(mode=mode)
 
     def forward(self, x):
         # x -> (batch, n_crop, chan=4, H, W)
@@ -111,11 +111,13 @@ class ScResnet(nn.Module):
         x_cls = torch.permute(x_cls, (1, 2, 0, 3, 4)) # (batch, n_crop, chan=3, H, W)
 
         x_sc = self.salience_map(x_sc)  # (batch, n_crop)
-        if self.is_training:
+        if self.training:
+            print('train')
             x_sc = x_sc.view(x_sc.shape[0], x_sc.shape[1], 1, 1, 1)
             x_cls = x_cls * x_sc
             x_cls = torch.sum(x_cls, dim=1)
         else:
+            print('eval')
             x_sc = torch.argmax(x_sc, dim=1)
             x_cls = torch.index_select(x_cls, dim=1, index=x_sc)
             # print(f'in validation shape={x_cls.shape}')
