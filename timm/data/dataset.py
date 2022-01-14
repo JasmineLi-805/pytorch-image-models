@@ -191,16 +191,10 @@ class SalienceImageDataset(ImageDataset):
 
     def __getitem__(self, index):
         # print(f'getting item from SalienceImageDataset')
-        img, target = self.parser[index]
-        try:
-            img = img.read() if self.load_bytes else Image.open(img).convert('RGB')
-        except Exception as e:
-            _logger.warning(f'Skipped sample (index {index}, file {self.parser.filename(index)}). {str(e)}')
-            self._consecutive_errors += 1
-            if self._consecutive_errors < _ERROR_RETRY:
-                return self.__getitem__((index + 1) % len(self.parser))
-            else:
-                raise e
+        img, target = super.__getitem__(index)
+        trans = transforms.ToPILImage()
+        img = trans(img)
+
         ds_nocrop = self.downsize(img)
         ds_nocrop = torch.unsqueeze(ds_nocrop, 0)   # torch.Size([1, 1, 224, 224])
 
