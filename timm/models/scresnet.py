@@ -121,10 +121,17 @@ class ScResnet(nn.Module):
             print(f'x_sc shape={x_sc.shape}')
             print(f'x_cls ori shape={x_cls.shape}')
             with torch.no_grad():
-                x_sc = torch.argmax(x_sc, dim=1)
+                x_sc = torch.argmax(x_sc, dim=1)    # [batch_size,]
+                x_sc = x_sc.unsqueeze(-1).unsqueeze(-1).unsqueeze(-1).unsqueeze(-1)
+                x_sc = x_sc.repeat(1, 1, self.orig_size[0], self.orig_size[1], self.orig_size[2])
                 print(f'x_sc argmax shape={x_sc.shape}')
                 x_cls = torch.gather(x_cls, dim=1, index=x_sc)
-            print(f'x_cls after shape={x_cls.shape}')
+                x_cls = torch.squeeze(x_cls)
+                print(f'x_cls after shape={x_cls.shape}')
+
+                from torchvision.utils import save_image
+                save_image(x_cls[0], 'img1.png')
+                assert False
         assert x_cls.shape[1:] == self.orig_size
         x = self.resnet(x_cls)
         return x
