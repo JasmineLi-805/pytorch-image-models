@@ -122,6 +122,7 @@ class ScResnet(nn.Module):
             print(f'x_cls ori shape={x_cls.shape}')
             with torch.no_grad():
                 x_sc = torch.argmax(x_sc, dim=1)
+                print(f'x_sc argmax shape={x_sc.shape}')
                 x_cls = torch.gather(x_cls, dim=1, index=x_sc)
             print(f'x_cls after shape={x_cls.shape}')
         assert x_cls.shape[1:] == self.orig_size
