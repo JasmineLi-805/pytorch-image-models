@@ -191,7 +191,7 @@ class SalienceImageDataset(ImageDataset):
 
     def __getitem__(self, index):
         # print(f'getting item from SalienceImageDataset')
-        img, target = super.__getitem__(index)
+        img, target = super().__getitem__(index)
         trans = transforms.ToPILImage()
         img = trans(img)
 
