@@ -52,8 +52,6 @@ class ImageDataset(data.Dataset):
                 raise e
         self._consecutive_errors = 0
         if self.transform is not None:
-            print(self.transform)
-            assert False
             img = self.transform(img)
         if target is None:
             target = -1
@@ -190,10 +188,7 @@ class SalienceImageDataset(ImageDataset):
         ])
 
     def __getitem__(self, index):
-        # print(f'getting item from SalienceImageDataset')
         img, target = super().__getitem__(index)
-        trans = transforms.ToPILImage()
-        img = trans(img)
 
         ds_nocrop = self.downsize(img)
         ds_nocrop = torch.unsqueeze(ds_nocrop, 0)   # torch.Size([1, 1, 224, 224])
