@@ -189,7 +189,9 @@ class SalienceImageDataset(ImageDataset):
 
     def __getitem__(self, index):
         img, target = super().__getitem__(index)
-
+        trans = transforms.ToPILImage()
+        img = trans(img)
+        
         ds_nocrop = self.downsize(img)
         ds_nocrop = torch.unsqueeze(ds_nocrop, 0)   # torch.Size([1, 1, 224, 224])
 
