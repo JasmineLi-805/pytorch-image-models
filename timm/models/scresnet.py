@@ -130,6 +130,7 @@ class ScResnet(nn.Module):
                 print(f'x_cls after shape={x_cls.shape}')
 
                 from torchvision.utils import save_image
+                print(x_cls[0].shape)
                 save_image(x_cls[0], 'img1.png')
                 assert False
         assert x_cls.shape[1:] == self.orig_size
