@@ -52,6 +52,8 @@ class ImageDataset(data.Dataset):
                 raise e
         self._consecutive_errors = 0
         if self.transform is not None:
+            print(self.transform)
+            assert False
             img = self.transform(img)
         if target is None:
             target = -1
@@ -176,7 +178,7 @@ class SalienceImageDataset(ImageDataset):
         self.downsize_transform = transforms.Compose([
             transforms.Resize((336, 336)),
             transforms.FiveCrop(self.large_size),   # outputs PIL img
-            transforms.Lambda(lambda images: [transforms.Resize(self.small_size, interpolation=InterpolationMode.BICUBIC)(img) for img in images]),
+            transforms.Lambda(lambda images: [transforms.Resize(self.small_size)(img) for img in images]),
             transforms.Lambda(lambda images: [transforms.Grayscale(num_output_channels=1)(img) for img in images]),
             transforms.Lambda(lambda images: [transforms.Pad([0, 0, self.large_size-self.small_size, self.large_size-self.small_size])(img) for img in images]),
             transforms.Lambda(lambda crops: torch.stack([transforms.ToTensor()(crop) for crop in crops])) # returns a 4D tensor
