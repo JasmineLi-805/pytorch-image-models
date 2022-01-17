@@ -190,7 +190,11 @@ class SalienceImageDataset(ImageDataset):
     def __getitem__(self, index):
         img, target = super().__getitem__(index)
         trans = transforms.ToPILImage()
-        assert len(img.shape)==3, f"{img.shape}, {self.transform}"
+        if len(img.shape)!=3:
+            print(img.shape)
+            from torchvision.utils import save_image
+            save_image(img[0][:3], 'img_error_c.png')
+            save_image(img[0][3], 'img_error_bw.png')
         img = trans(img)
         
         ds_nocrop = self.downsize(img)
@@ -209,6 +213,5 @@ class SalienceImageDataset(ImageDataset):
         original_crop = torch.permute(original_crop, (1, 0, 2, 3))
         img = torch.cat((original_crop,downsize_crop), dim=0)
         img = torch.permute(img, (1, 0, 2, 3))
-        # print(f'dataset out img shape={img.shape}')
-        # img = img.view(img.shape[0]*img.shape[1], img.shape[2], img.shape[3])
+
         return img, target
