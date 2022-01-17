@@ -189,12 +189,10 @@ class SalienceImageDataset(ImageDataset):
 
     def __getitem__(self, index):
         img, target = super().__getitem__(index)
+        if img.shape == (6, 4, self.large_size, self.large_size):
+            return img, target
+
         trans = transforms.ToPILImage()
-        if len(img.shape)!=3:
-            print(img.shape)
-            from torchvision.utils import save_image
-            save_image(img[0][:3], 'img_error_c.png')
-            save_image(img[0][3], 'img_error_bw.png')
         img = trans(img)
         
         ds_nocrop = self.downsize(img)
