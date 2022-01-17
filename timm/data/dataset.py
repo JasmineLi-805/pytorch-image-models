@@ -190,6 +190,7 @@ class SalienceImageDataset(ImageDataset):
     def __getitem__(self, index):
         img, target = super().__getitem__(index)
         trans = transforms.ToPILImage()
+        assert len(img.shape)==3
         img = trans(img)
         
         ds_nocrop = self.downsize(img)
