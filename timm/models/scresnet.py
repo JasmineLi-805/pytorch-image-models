@@ -91,13 +91,6 @@ class ScResnet(nn.Module):
 
         self.is_training = True
 
-    # def eval(self):
-    #     self.is_training = False
-    #     return super().eval()
-    
-    # def train(self, mode: bool = True):
-    #     self.is_training = mode
-    #     return super().train(mode=mode)
 
     def forward(self, x):
         # x -> (batch, n_crop, chan=4, H, W)
@@ -112,30 +105,20 @@ class ScResnet(nn.Module):
         x_cls = torch.permute(x_cls, (1, 2, 0, 3, 4)) # (batch, n_crop, chan=3, H, W)
 
         x_sc = self.salience_map(x_sc)  # (batch, n_crop)
-        if True:
-        # if self.training:
+        if self.training:
             # print('train')
             x_sc = x_sc.view(x_sc.shape[0], x_sc.shape[1], 1, 1, 1)
             x_cls = x_cls * x_sc
             x_cls = torch.sum(x_cls, dim=1)
         else:
-            # print('eval')
-            # print(f'x_sc shape={x_sc.shape}')
-            # print(f'x_cls ori shape={x_cls.shape}')
+            # print('eval'))
             with torch.no_grad():
-                # print(torch.sum(x_sc, dim=0) / x_sc.shape[0])
+                print(torch.sum(x_sc, dim=0) / x_sc.shape[0])
                 x_sc = torch.argmax(x_sc, dim=1)    # [batch_size,]
                 x_sc = x_sc.unsqueeze(-1).unsqueeze(-1).unsqueeze(-1).unsqueeze(-1)
                 x_sc = x_sc.repeat(1, 1, self.orig_size[0], self.orig_size[1], self.orig_size[2])
-                # print(f'x_sc argmax shape={x_sc.shape}')
                 x_cls = torch.gather(x_cls, dim=1, index=x_sc)
                 x_cls = torch.squeeze(x_cls)
-                # print(f'x_cls after shape={x_cls.shape}')
-
-                # from torchvision.utils import save_image
-                # print(x_cls[0].shape)
-                # save_image(x_cls[0], 'img1.png')
-                # assert False
         assert x_cls.shape[1:] == self.orig_size
         x = self.resnet(x_cls)
         return x
