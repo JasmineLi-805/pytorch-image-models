@@ -112,7 +112,8 @@ class ScResnet(nn.Module):
         x_cls = torch.permute(x_cls, (1, 2, 0, 3, 4)) # (batch, n_crop, chan=3, H, W)
 
         x_sc = self.salience_map(x_sc)  # (batch, n_crop)
-        if self.training:
+        if True:
+        # if self.training:
             # print('train')
             x_sc = x_sc.view(x_sc.shape[0], x_sc.shape[1], 1, 1, 1)
             x_cls = x_cls * x_sc
