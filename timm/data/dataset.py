@@ -189,8 +189,8 @@ class SalienceImageDataset(ImageDataset):
 
     def __getitem__(self, index):
         img, target = super().__getitem__(index)
-        if img.shape == (6, 4, self.large_size, self.large_size):
-            return img, target
+        # if img.shape == (6, 4, self.large_size, self.large_size):
+        #     return img, target
 
         trans = transforms.ToPILImage()
         img = trans(img)
