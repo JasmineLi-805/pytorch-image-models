@@ -23,9 +23,9 @@ default_cfg = {
 model_cfg = {
     'SC_layers': [
         # in_chan, out_chan, kernel_size, stride, activation
-        [ 1,  8, 3, 2, 'relu6'],
-        [ 8, 16, 3, 2, 'relu6'],
-        [16, 32, 3, 2, 'relu6']
+        [ 1,  16, 3, 2, 'relu6'],
+        [ 16, 32, 3, 2, 'relu6'],
+        [ 32, 64, 3, 2, 'relu6']
     ],
     'downsample_size': (1, 64, 64),
     'original_size': (3, 224, 224),
