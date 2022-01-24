@@ -115,7 +115,7 @@ class ScResnet(nn.Module):
             with torch.no_grad():
                 # print(torch.sum(x_sc, dim=0) / x_sc.shape[0])
                 x_sc = torch.argmax(x_sc, dim=1)    # [batch_size,]
-                print(x_sc)
+                # print(x_sc)
                 x_sc = x_sc.unsqueeze(-1).unsqueeze(-1).unsqueeze(-1).unsqueeze(-1)
                 x_sc = x_sc.repeat(1, 1, self.orig_size[0], self.orig_size[1], self.orig_size[2])
                 x_cls = torch.gather(x_cls, dim=1, index=x_sc)
