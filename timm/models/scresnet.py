@@ -111,7 +111,7 @@ class ScResnet(nn.Module):
             x_cls = x_cls * x_sc
             x_cls = torch.sum(x_cls, dim=1)
         else:
-            print('eval'))
+            # print('eval')
             with torch.no_grad():
                 print(torch.sum(x_sc, dim=0) / x_sc.shape[0])
                 x_sc = torch.argmax(x_sc, dim=1)    # [batch_size,]
