@@ -106,15 +106,16 @@ class ScResnet(nn.Module):
 
         x_sc = self.salience_map(x_sc)  # (batch, n_crop)
         if self.training:
-            print('train')
+            # print('train')
             x_sc = x_sc.view(x_sc.shape[0], x_sc.shape[1], 1, 1, 1)
             x_cls = x_cls * x_sc
             x_cls = torch.sum(x_cls, dim=1)
         else:
-            # print('eval')
+            # print('eval'))
             with torch.no_grad():
-                print(torch.sum(x_sc, dim=0) / x_sc.shape[0])
+                # print(torch.sum(x_sc, dim=0) / x_sc.shape[0])
                 x_sc = torch.argmax(x_sc, dim=1)    # [batch_size,]
+                print(torch.sum(x_sc, dim=0) / x_sc.shape[0])
                 x_sc = x_sc.unsqueeze(-1).unsqueeze(-1).unsqueeze(-1).unsqueeze(-1)
                 x_sc = x_sc.repeat(1, 1, self.orig_size[0], self.orig_size[1], self.orig_size[2])
                 x_cls = torch.gather(x_cls, dim=1, index=x_sc)
