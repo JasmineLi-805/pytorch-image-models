@@ -200,6 +200,11 @@ class SalienceImageDataset(ImageDataset):
 
         trans = transforms.ToPILImage()
         img = trans(img)
+
+        image = img
+        image_name = f'img{index}-toPIL.png'
+        save_image(image, image_name)
+        assert False
         
         ds_nocrop = self.downsize(img)
         ds_nocrop = torch.unsqueeze(ds_nocrop, 0)   # torch.Size([1, 1, 224, 224])
@@ -213,10 +218,6 @@ class SalienceImageDataset(ImageDataset):
         original_crop = self.original_transform(img)    # torch.Size([5, 3, 224, 224])
         original_crop = torch.cat((ori_nocrop, original_crop), dim=0)   # torch.Size([6, 3, 224, 224])
 
-        image = original_crop[0]
-        image_name = f'img{index}-crop.png'
-        save_image(image, image_name)
-        assert False
 
         downsize_crop = torch.permute(downsize_crop, (1, 0, 2, 3))
         original_crop = torch.permute(original_crop, (1, 0, 2, 3))
