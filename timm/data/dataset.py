@@ -201,9 +201,8 @@ class SalienceImageDataset(ImageDataset):
         trans = transforms.ToPILImage()
         img = trans(img)
 
-        image = img
         image_name = f'img{index}-toPIL.png'
-        save_image(image, image_name)
+        img.save(image_name)
         assert False
         
         ds_nocrop = self.downsize(img)
