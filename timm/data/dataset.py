@@ -189,6 +189,12 @@ class SalienceImageDataset(ImageDataset):
 
     def __getitem__(self, index):
         img, target = super().__getitem__(index)
+        
+        from torchvision.utils import save_image
+        image = img
+        image_name = f'img{index}-nocrop.png'
+        save_image(image, image_name)
+        
         if img.shape == (6, 4, self.large_size, self.large_size):
             return img, target
 
@@ -206,6 +212,11 @@ class SalienceImageDataset(ImageDataset):
 
         original_crop = self.original_transform(img)    # torch.Size([5, 3, 224, 224])
         original_crop = torch.cat((ori_nocrop, original_crop), dim=0)   # torch.Size([6, 3, 224, 224])
+
+        image = original_crop[0]
+        image_name = f'img{index}-crop.png'
+        save_image(image, image_name)
+        assert False
 
         downsize_crop = torch.permute(downsize_crop, (1, 0, 2, 3))
         original_crop = torch.permute(original_crop, (1, 0, 2, 3))
