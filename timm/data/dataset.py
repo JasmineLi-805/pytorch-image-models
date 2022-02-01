@@ -189,15 +189,15 @@ class SalienceImageDataset(ImageDataset):
 
     def __getitem__(self, index):
         img, target = super().__getitem__(index)
-        
-        from torchvision.utils import save_image
-        image = img
-        image_name = f'img{index}-nocrop.png'
-        save_image(image, image_name)
-        
         if img.shape == (6, 4, self.large_size, self.large_size):
             return img, target
 
+        from torchvision.utils import save_image
+        image = img
+        image_name = f'img{index}-orig.png'
+        save_image(image, image_name)
+
+        print(img)
         trans = transforms.ToPILImage()
         img = trans(img)
 
