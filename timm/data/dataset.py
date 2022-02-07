@@ -12,6 +12,8 @@ from torchvision import transforms
 from PIL import Image
 from torchvision.transforms.functional import InterpolationMode
 
+from timm.data.constants import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
+
 from .parsers import create_parser
 
 _logger = logging.getLogger(__name__)
@@ -193,15 +195,23 @@ class SalienceImageDataset(ImageDataset):
         if img.shape == (6, 4, self.large_size, self.large_size):
             return img, target
 
-        # from torchvision.utils import save_image
-        # image = img
-        # image_name = f'img{index}-orig.png'
-        # save_image(image, image_name)
+        from torchvision.utils import save_image
+        image = img
+        image_name = f'img{index}-orig.png'
+        save_image(image, image_name)
 
-        print(img)
-        assert False
+        # revert transforms.normalize on image tensor
+        std = torch.tensor(IMAGENET_DEFAULT_STD)
+        std = std.view(std.shape[0], 1, 1)
+        img = img * std
+        mean = torch.tensor(IMAGENET_DEFAULT_MEAN)
+        mean = mean.view(mean.shape[0], 1)
+        mean = mean.repeat(1, img.shape[1]*img.shape[2])
+        mean = mean.view(img.shape[0], img.shape[1], img.shape[2])
+        img = img + mean
+
         trans = transforms.ToPILImage()
-        img = trans(img.convert("RGB"))
+        img = trans(img)
 
         image_name = f'img{index}-toPIL.png'
         img.save(image_name)
