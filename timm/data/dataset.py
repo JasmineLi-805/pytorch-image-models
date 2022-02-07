@@ -162,6 +162,8 @@ Additional Dataset type for SalienceMap+Classification model
 '''
 class SalienceImageDataset(ImageDataset):
     def __init__(self, root, parser=None, class_map=None, load_bytes=False, transform=None, target_transform=None):
+        print(transform)
+        transform = transform[:-1]
         super().__init__(root, parser=parser, class_map=class_map, load_bytes=load_bytes, transform=transform, target_transform=target_transform)
         self.small_size = 64
         self.large_size = 224
@@ -195,13 +197,12 @@ class SalienceImageDataset(ImageDataset):
         if img.shape == (6, 4, self.large_size, self.large_size):
             return img, target
 
-        print(type(self.transform))
         print(self.transform)
 
         from torchvision.utils import save_image
         image = img
         image_name = f'img{index}-orig.png'
-        # save_image(image, image_name)
+        save_image(image, image_name)
 
         # revert transforms.normalize on image tensor
         # std = torch.tensor(IMAGENET_DEFAULT_STD)
@@ -216,7 +217,7 @@ class SalienceImageDataset(ImageDataset):
         trans = transforms.ToPILImage()
         img = trans(img)
         image_name = f'img{index}-toPIL.png'
-        # img.save(image_name)
+        img.save(image_name)
         assert False
         
         ds_nocrop = self.downsize(img)
