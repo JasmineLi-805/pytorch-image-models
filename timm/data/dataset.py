@@ -163,8 +163,9 @@ Additional Dataset type for SalienceMap+Classification model
 class SalienceImageDataset(ImageDataset):
     def __init__(self, root, parser=None, class_map=None, load_bytes=False, transform=None, target_transform=None):
         print(transform)
-        transform = transform[:-1]
+        # transform = transform[:-1]
         super().__init__(root, parser=parser, class_map=class_map, load_bytes=load_bytes, transform=transform, target_transform=target_transform)
+        print(self.transform)
         self.small_size = 64
         self.large_size = 224
         self.downsize = transforms.Compose([
