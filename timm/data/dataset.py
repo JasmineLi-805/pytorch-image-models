@@ -199,7 +199,7 @@ class SalienceImageDataset(ImageDataset):
 
         print(img)
         trans = transforms.ToPILImage()
-        img = trans(img)
+        img = trans(img.convert("RGB"))
 
         image_name = f'img{index}-toPIL.png'
         img.save(image_name)
