@@ -193,17 +193,18 @@ class SalienceImageDataset(ImageDataset):
         ])
 
     def __getitem__(self, index):
-        img, target = super().__getitem__(index)
+        if type(self.transform.transforms[-1]) == transforms.Normalize:
+            self.transform.transforms = self.transform.transforms[:-1]
         print(self.transform)
+        
+        img, target = super().__getitem__(index)
         if img.shape == (6, 4, self.large_size, self.large_size):
             return img, target
 
-        print(self.transform)
-
-        from torchvision.utils import save_image
-        image = img
-        image_name = f'img{index}-orig.png'
-        save_image(image, image_name)
+        # from torchvision.utils import save_image
+        # image = img
+        # image_name = f'img{index}-orig.png'
+        # save_image(image, image_name)
 
         # revert transforms.normalize on image tensor
         # std = torch.tensor(IMAGENET_DEFAULT_STD)
@@ -214,7 +215,9 @@ class SalienceImageDataset(ImageDataset):
         # mean = mean.repeat(1, img.shape[1]*img.shape[2])
         # mean = mean.view(img.shape[0], img.shape[1], img.shape[2])
         # img = img + mean
-
+        
+        # denormalize (copied from torchvision.utils.save_image())
+        # img = img.mul(255).add_(0.5).clamp_(0, 255).permute(1, 2, 0)
         trans = transforms.ToPILImage()
         img = trans(img)
         image_name = f'img{index}-toPIL.png'
