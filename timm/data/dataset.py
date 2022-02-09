@@ -201,11 +201,6 @@ class SalienceImageDataset(ImageDataset):
         if img.shape == (6, 4, self.large_size, self.large_size):
             return img, target
 
-        # from torchvision.utils import save_image
-        # image = img
-        # image_name = f'img{index}-orig.png'
-        # save_image(image, image_name)
-
         # revert transforms.normalize on image tensor
         # std = torch.tensor(IMAGENET_DEFAULT_STD)
         # std = std.view(std.shape[0], 1, 1)
@@ -216,13 +211,11 @@ class SalienceImageDataset(ImageDataset):
         # mean = mean.view(img.shape[0], img.shape[1], img.shape[2])
         # img = img + mean
         
-        # denormalize (copied from torchvision.utils.save_image())
-        # img = img.mul(255).add_(0.5).clamp_(0, 255).permute(1, 2, 0)
         trans = transforms.ToPILImage()
         img = trans(img)
-        image_name = f'img{index}-toPIL.png'
-        img.save(image_name)
-        assert False
+        if index % 10000 == 1:
+            image_name = f'img{index}-toPIL.png'
+            img.save(image_name)
         
         ds_nocrop = self.downsize(img)
         ds_nocrop = torch.unsqueeze(ds_nocrop, 0)   # torch.Size([1, 1, 224, 224])
