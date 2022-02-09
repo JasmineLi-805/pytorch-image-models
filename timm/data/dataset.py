@@ -195,7 +195,6 @@ class SalienceImageDataset(ImageDataset):
     def __getitem__(self, index):
         if type(self.transform.transforms[-1]) == transforms.Normalize:
             self.transform.transforms = self.transform.transforms[:-1]
-        print(self.transform)
         
         img, target = super().__getitem__(index)
         if img.shape == (6, 4, self.large_size, self.large_size):
