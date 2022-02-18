@@ -209,9 +209,9 @@ class SalienceImageDataset(ImageDataset):
         
         trans = transforms.ToPILImage()
         img = trans(img)
-        if index % 10000 == 1:
-            image_name = f'img{index}-toPIL.png'
-            img.save(image_name)
+        # if index % 10000 == 1:
+        #     image_name = f'img{index}-toPIL.png'
+        #     img.save(image_name)
         
         ds_nocrop = self.downsize(img)
         ds_nocrop = torch.unsqueeze(ds_nocrop, 0)   # torch.Size([1, 1, 224, 224])
