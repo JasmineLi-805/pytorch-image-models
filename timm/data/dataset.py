@@ -190,22 +190,15 @@ class SalienceImageDataset(ImageDataset):
         ])
 
     def __getitem__(self, index):
+        if self.transform:
+            print(self.transform)
+
         if type(self.transform.transforms[-1]) == transforms.Normalize:
             self.transform.transforms = self.transform.transforms[:-1]
         
         img, target = super().__getitem__(index)
         if img.shape == (6, 4, self.large_size, self.large_size):
             return img, target
-
-        # revert transforms.normalize on image tensor
-        # std = torch.tensor(IMAGENET_DEFAULT_STD)
-        # std = std.view(std.shape[0], 1, 1)
-        # img = img * std
-        # mean = torch.tensor(IMAGENET_DEFAULT_MEAN)
-        # mean = mean.view(mean.shape[0], 1)
-        # mean = mean.repeat(1, img.shape[1]*img.shape[2])
-        # mean = mean.view(img.shape[0], img.shape[1], img.shape[2])
-        # img = img + mean
         
         trans = transforms.ToPILImage()
         img = trans(img)
@@ -224,7 +217,6 @@ class SalienceImageDataset(ImageDataset):
 
         original_crop = self.original_transform(img)    # torch.Size([5, 3, 224, 224])
         original_crop = torch.cat((ori_nocrop, original_crop), dim=0)   # torch.Size([6, 3, 224, 224])
-
 
         downsize_crop = torch.permute(downsize_crop, (1, 0, 2, 3))
         original_crop = torch.permute(original_crop, (1, 0, 2, 3))

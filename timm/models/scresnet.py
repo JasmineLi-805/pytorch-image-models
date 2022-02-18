@@ -91,8 +91,7 @@ class ScResnet(nn.Module):
 
         self.is_training = True
         
-        # self.saved_cnt = 0
-        # self.save_bit = True
+        self.saved_cnt = 0
 
 
     def forward(self, x):
@@ -124,13 +123,12 @@ class ScResnet(nn.Module):
                 x_cls = torch.gather(x_cls, dim=1, index=x_sc)
                 x_cls = torch.squeeze(x_cls)
                 
-                # self.save_bit = not self.save_bit
-                # if self.save_bit:
-                #     from torchvision.utils import save_image
-                #     image = x_cls[0]
-                #     image_name = f'selected/img{self.saved_cnt}.png'
-                #     save_image(image, image_name)
-                #     self.saved_cnt += 1
+                if self.saved_cn % 10000 == 0:
+                    from torchvision.utils import save_image
+                    image = x_cls[0]
+                    image_name = f'selected/img{self.saved_cnt}.png'
+                    save_image(image, image_name)
+                    self.saved_cnt += 1
 
         assert x_cls.shape[1:] == self.orig_size
         x = self.resnet(x_cls)
