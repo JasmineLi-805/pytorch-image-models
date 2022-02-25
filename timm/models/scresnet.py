@@ -65,7 +65,7 @@ class ScLayer(nn.Module):
             h = calc_conv_out_dim(h, layer_cfg[2], layer_cfg[3])
             w = calc_conv_out_dim(w, layer_cfg[2], layer_cfg[3])
         self.blocks = nn.Sequential(*block_list)
-        self.fc = nn.Linear(c * h * w, 1)
+        self.fc = nn.Linear(c * h * w, 6)
 
     def forward(self, x):
         # x: (batch, crop_n, channel, height, width)
@@ -97,20 +97,20 @@ class ScResnet(nn.Module):
 
 
     def forward(self, x):
-        # x -> (batch, n_crop, chan=4, H, W)
+        # x -> (batch, 5_crop(5)+orig(1)+grey(1), chan=3, H, W)
         # print(f'the shape of input img={x.shape}')
-        x = torch.permute(x, (2, 0, 1, 3, 4))
+        x = torch.permute(x, (1, 0, 2, 3, 4))
         # x -> (chan=4, batch, n_crop, H, W)
-        assert x.shape[0] == 4
-        x_sc = x[3].unsqueeze(dim=0)     # (chan=1, batch, n_crop, H, W)
-        x_cls = x[:3]   # (chan=3, batch, n_crop, H, W)
-        x_sc = torch.permute(x_sc, (1, 2, 0, 3, 4)) # (batch, n_crop, chan=1, H, W)
+        assert x.shape[0] == 7
+        x_sc = x[0]     # (n_crop=1, batch, chan=3, H, W)
+        x_cls = x[1:]   # (n_crop=6, batch, chan=3, H, W)
+        x_sc = torch.permute(x_sc, (1, 0, 2, 3, 4)) # (batch, n_crop=1, chan=3, H, W)
         x_sc = x_sc[:, :, :self.down_size[0], :self.down_size[1], :self.down_size[2]]   # remove the padded region
-        x_cls = torch.permute(x_cls, (1, 2, 0, 3, 4)) # (batch, n_crop, chan=3, H, W)
+        x_cls = torch.permute(x_cls, (1, 0, 2, 3, 4)) # (batch, n_crop, chan=3, H, W)
         
         trans = transforms.ToPILImage()
         if self.image_cnt <= 10 and self.enable_image_save:
-            for j in range(10):
+            for j in range(5):
                 greys = x_sc[j]
                 for i in range(greys.shape[0]):
                     grey = trans(greys[i])
