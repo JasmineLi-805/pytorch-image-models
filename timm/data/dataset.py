@@ -207,7 +207,7 @@ class SalienceImageDataset(ImageDataset):
         ds_nocrop = self.downsize(img)
         padding = torch.zeros((2, self.large_size, self.large_size))
         ds_nocrop = torch.cat((ds_nocrop, padding), dim=0)
-        assert ds_nocrop.shape == (1, 3, self.large_size, self.large_size)
+        assert ds_nocrop.shape == (3, self.large_size, self.large_size)
         ds_nocrop = torch.unsqueeze(ds_nocrop, 0)   # torch.Size([1, 3, 224, 224])
 
         ori_nocrop = self.original(img)
@@ -218,7 +218,7 @@ class SalienceImageDataset(ImageDataset):
 
         img = torch.cat((original_crop,ds_nocrop), dim=0)
         assert img.shape == (7,3,self.large_size, self.large_size) # (7,3,224,224)
-                
+
         if index % 10000 == 1 and self.enable_img_save:
             assert img.shape == (6, 4, self.large_size, self.large_size)
             for i in range(img.shape[0]):
