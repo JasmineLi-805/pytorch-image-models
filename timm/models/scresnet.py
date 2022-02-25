@@ -68,14 +68,14 @@ class ScLayer(nn.Module):
         self.fc = nn.Linear(c * h * w, 6)
 
     def forward(self, x):
-        # x: (batch, crop_n, channel, height, width)
+        # x: (batch, n_crop=1, chan=1, H, W)
         batch_size = x.shape[0]
         n = x.shape[1]
         x = x.view(batch_size * n, x.shape[2], x.shape[3], x.shape[4])
         x = self.blocks(x)
         x = x.view(x.shape[0], -1)
         x = self.fc(x)
-        x = x.view(batch_size, n)
+        x = x.view(batch_size, 6)
         x = F.gumbel_softmax(x, dim=1)
         return x
 
@@ -105,8 +105,7 @@ class ScResnet(nn.Module):
         x_sc = x[0].unsqueeze(dim=0)     # (n_crop=1, batch, chan=3, H, W)
         x_cls = x[1:]   # (n_crop=6, batch, chan=3, H, W)
         x_sc = torch.permute(x_sc, (1, 0, 2, 3, 4)) # (batch, n_crop=1, chan=3, H, W)
-        x_sc = x_sc[:, :, :self.down_size[0], :self.down_size[1], :self.down_size[2]]   # remove the padded region
-        print(f'x_sc={x_sc.shape}')
+        x_sc = x_sc[:, :, :self.down_size[0], :self.down_size[1], :self.down_size[2]]   # remove the padded region (batch, n_crop=1, chan=1, H, W)
         assert x_sc.shape == (x_sc.shape[0], 1, 1, self.down_size[1], self.down_size[2])
         x_cls = torch.permute(x_cls, (1, 0, 2, 3, 4)) # (batch, n_crop, chan=3, H, W)
         
