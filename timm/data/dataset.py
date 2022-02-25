@@ -195,7 +195,7 @@ class SalienceImageDataset(ImageDataset):
             self.transform.transforms = self.transform.transforms[:-1]
         
         img, target = super().__getitem__(index)
-        if img.shape == (6, 4, self.large_size, self.large_size):
+        if img.shape == (7, 3, self.large_size, self.large_size):
             return img, target
         
         trans = transforms.ToPILImage()
