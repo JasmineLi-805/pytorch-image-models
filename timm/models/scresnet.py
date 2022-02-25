@@ -109,7 +109,7 @@ class ScResnet(nn.Module):
         x_cls = torch.permute(x_cls, (1, 2, 0, 3, 4)) # (batch, n_crop, chan=3, H, W)
         
         trans = transforms.ToPILImage()
-        if self.image_cnt % 1000 == 0 and self.enable_image_save:
+        if self.image_cnt <= 10 and self.enable_image_save:
             greys = x_sc[0]
             for i in range(greys.shape[0]):
                 grey = trans(greys[i])
@@ -139,7 +139,7 @@ class ScResnet(nn.Module):
                 x_cls = torch.gather(x_cls, dim=1, index=x_sc)
                 x_cls = torch.squeeze(x_cls)
                 
-                if self.image_cnt % 1000 == 0 and self.enable_image_save:
+                if self.image_cnt <= 10 and self.enable_image_save:
                     image = trans(x_cls[0])
                     image_name = f'check/img-{self.image_cnt}-EvalSelected.png'
                     image.save(image_name)
