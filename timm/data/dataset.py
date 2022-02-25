@@ -216,7 +216,7 @@ class SalienceImageDataset(ImageDataset):
         original_crop = self.original_transform(img)    # torch.Size([5, 3, 224, 224])
         original_crop = torch.cat((ori_nocrop, original_crop), dim=0)   # torch.Size([6, 3, 224, 224])
 
-        img = torch.cat((original_crop,ds_nocrop), dim=0)
+        img = torch.cat((ds_nocrop, original_crop), dim=0)
         assert img.shape == (7,3,self.large_size, self.large_size) # (7,3,224,224)
 
         if index % 10000 == 1 and self.enable_img_save:
