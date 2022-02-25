@@ -693,6 +693,8 @@ def train_one_epoch(
             output = model(input)
             loss = loss_fn(output, target)
             
+            print(f"output shape = {output.shape}")
+            print(f"target shape = {target.shape}")
             diff = output - target
             accu = 1.0 - torch.count_nonzero(diff) / output.size()
 
