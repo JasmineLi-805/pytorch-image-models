@@ -188,6 +188,7 @@ class SalienceImageDataset(ImageDataset):
             transforms.FiveCrop(self.large_size),   # outputs PIL img
             transforms.Lambda(lambda crops: torch.stack([transforms.ToTensor()(crop) for crop in crops])) # returns a 4D tensor
         ])
+        self.enable_img_save = True
 
     def __getitem__(self, index):
         # if self.transform:
@@ -202,37 +203,37 @@ class SalienceImageDataset(ImageDataset):
         
         trans = transforms.ToPILImage()
         img = trans(img)
-        if index % 10000 == 1:
-            image_name = f'img{index}-toPIL.png'
+        if index % 10000 == 1 and self.enable_img_save:
+            image_name = f'check/img{index}-toPIL.png'
             img.save(image_name)
         
         ds_nocrop = self.downsize(img)
-        if index % 10000 == 1:
+        if index % 10000 == 1 and self.enable_img_save:
             toSave = trans(ds_nocrop)
-            image_name = f'img{index}-DownSize.png'
+            image_name = f'check/img{index}-DownSize.png'
             toSave.save(image_name)
         ds_nocrop = torch.unsqueeze(ds_nocrop, 0)   # torch.Size([1, 1, 224, 224])
 
         ori_nocrop = self.original(img)
-        if index % 10000 == 1:
+        if index % 10000 == 1 and self.enable_img_save:
             toSave = trans(ori_nocrop)
-            image_name = f'img{index}-Orig.png'
+            image_name = f'check/img{index}-Orig.png'
             toSave.save(image_name)
         ori_nocrop = torch.unsqueeze(ori_nocrop, 0) # torch.Size([1, 3, 224, 224])
         
         downsize_crop = self.downsize_transform(img)    # torch.Size([5, 1, 224, 224])
-        if index % 10000 == 1:
+        if index % 10000 == 1 and self.enable_img_save:
             for i in range(downsize_crop.shape[0]):
                 toSave = trans(downsize_crop[i])
-                image_name = f'img{index}-5cropDown-{i}.png'
+                image_name = f'check/img{index}-5cropDown-{i}.png'
                 toSave.save(image_name)
         downsize_crop = torch.cat((ds_nocrop, downsize_crop), dim=0)    # torch.Size([6, 1, 224, 224])
 
         original_crop = self.original_transform(img)    # torch.Size([5, 3, 224, 224])
-        if index % 10000 == 1:
+        if index % 10000 == 1 and self.enable_img_save:
             for i in range(original_crop.shape[0]):
                 toSave = trans(original_crop[i])
-                image_name = f'img{index}-5cropOrig-{i}.png'
+                image_name = f'check/img{index}-5cropOrig-{i}.png'
                 toSave.save(image_name)
         original_crop = torch.cat((ori_nocrop, original_crop), dim=0)   # torch.Size([6, 3, 224, 224])
 
