@@ -191,9 +191,6 @@ class SalienceImageDataset(ImageDataset):
         self.enable_img_save = True
 
     def __getitem__(self, index):
-        # if self.transform:
-        #     print(self.transform)
-
         if type(self.transform.transforms[-1]) == transforms.Normalize:
             self.transform.transforms = self.transform.transforms[:-1]
         
@@ -208,38 +205,30 @@ class SalienceImageDataset(ImageDataset):
             img.save(image_name)
         
         ds_nocrop = self.downsize(img)
-        if index % 10000 == 1 and self.enable_img_save:
-            toSave = trans(ds_nocrop)
-            image_name = f'check/img{index}-DownSize.png'
-            toSave.save(image_name)
         ds_nocrop = torch.unsqueeze(ds_nocrop, 0)   # torch.Size([1, 1, 224, 224])
 
         ori_nocrop = self.original(img)
-        if index % 10000 == 1 and self.enable_img_save:
-            toSave = trans(ori_nocrop)
-            image_name = f'check/img{index}-Orig.png'
-            toSave.save(image_name)
         ori_nocrop = torch.unsqueeze(ori_nocrop, 0) # torch.Size([1, 3, 224, 224])
         
         downsize_crop = self.downsize_transform(img)    # torch.Size([5, 1, 224, 224])
-        if index % 10000 == 1 and self.enable_img_save:
-            for i in range(downsize_crop.shape[0]):
-                toSave = trans(downsize_crop[i])
-                image_name = f'check/img{index}-5cropDown-{i}.png'
-                toSave.save(image_name)
         downsize_crop = torch.cat((ds_nocrop, downsize_crop), dim=0)    # torch.Size([6, 1, 224, 224])
 
         original_crop = self.original_transform(img)    # torch.Size([5, 3, 224, 224])
-        if index % 10000 == 1 and self.enable_img_save:
-            for i in range(original_crop.shape[0]):
-                toSave = trans(original_crop[i])
-                image_name = f'check/img{index}-5cropOrig-{i}.png'
-                toSave.save(image_name)
         original_crop = torch.cat((ori_nocrop, original_crop), dim=0)   # torch.Size([6, 3, 224, 224])
 
         downsize_crop = torch.permute(downsize_crop, (1, 0, 2, 3))
         original_crop = torch.permute(original_crop, (1, 0, 2, 3))
         img = torch.cat((original_crop,downsize_crop), dim=0)
         img = torch.permute(img, (1, 0, 2, 3))
+        
+        if index % 10000 == 1 and self.enable_img_save:
+            assert img.shape == (6, 4, self.large_size, self.large_size)
+            for i in range(img.shape[0]):
+                color= trans(img[i][:3])
+                grey = trans(img[i][3])
+                color_name = f'check/img{index}-color-{i}.png'
+                grey_name = f'check/img{index}-grey-{i}.png'
+                color.save(color_name)
+                grey.save(grey_name)
 
         return img, target
