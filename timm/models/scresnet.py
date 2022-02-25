@@ -106,6 +106,8 @@ class ScResnet(nn.Module):
         x_cls = x[1:]   # (n_crop=6, batch, chan=3, H, W)
         x_sc = torch.permute(x_sc, (1, 0, 2, 3, 4)) # (batch, n_crop=1, chan=3, H, W)
         x_sc = x_sc[:, :, :self.down_size[0], :self.down_size[1], :self.down_size[2]]   # remove the padded region
+        print(f'x_sc={x_sc.shape}')
+        assert x_sc.shape == (x_sc.shape[0], 1, 1, self.down_size[1], self.down_size[2])
         x_cls = torch.permute(x_cls, (1, 0, 2, 3, 4)) # (batch, n_crop, chan=3, H, W)
         
         trans = transforms.ToPILImage()
