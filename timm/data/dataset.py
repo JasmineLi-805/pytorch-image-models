@@ -188,7 +188,7 @@ class SalienceImageDataset(ImageDataset):
             transforms.FiveCrop(self.large_size),   # outputs PIL img
             transforms.Lambda(lambda crops: torch.stack([transforms.ToTensor()(crop) for crop in crops])) # returns a 4D tensor
         ])
-        self.enable_img_save = True
+        self.enable_img_save = False
 
     def __getitem__(self, index):
         if type(self.transform.transforms[-1]) == transforms.Normalize:

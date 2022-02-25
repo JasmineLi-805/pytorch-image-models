@@ -7,6 +7,7 @@ from .factory import create_model
 from .registry import register_model
 from .helpers import build_model_with_cfg
 from timm.data import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
+from torchvision import transforms
 
 # __all__ = ['ScResnet']  # model_registry will add each entrypoint fn to this
 
@@ -91,7 +92,8 @@ class ScResnet(nn.Module):
 
         self.is_training = True
         
-        self.saved_cnt = 0
+        self.image_cnt = 0
+        self.enable_image_save = True
 
 
     def forward(self, x):
@@ -105,6 +107,20 @@ class ScResnet(nn.Module):
         x_sc = torch.permute(x_sc, (1, 2, 0, 3, 4)) # (batch, n_crop, chan=1, H, W)
         x_sc = x_sc[:, :, :self.down_size[0], :self.down_size[1], :self.down_size[2]]   # remove the padded region
         x_cls = torch.permute(x_cls, (1, 2, 0, 3, 4)) # (batch, n_crop, chan=3, H, W)
+        
+        trans = transforms.ToPILImage()
+        if self.image_cnt % 10000 == 0 and self.enable_image_save:
+            greys = x_sc[0]
+            for i in range(greys.shape[0]):
+                grey = trans(greys[i])
+                grey_name = f'check/img-{self.image_cnt}-unpack-grey-{i}.png'
+                grey.save(grey_name)
+
+            colors = x_cls[0]
+            for i in range(colors.shape[0]):
+                color = trans(colors[i])
+                color_name = f'check/img-{self.image_cnt}-unpack-color-{i}.png'
+                color.save(color_name)
 
         x_sc = self.salience_map(x_sc)  # (batch, n_crop)
         if self.training:
@@ -123,12 +139,11 @@ class ScResnet(nn.Module):
                 x_cls = torch.gather(x_cls, dim=1, index=x_sc)
                 x_cls = torch.squeeze(x_cls)
                 
-                # if self.saved_cnt % 10000 == 0:
-                #     from torchvision.utils import save_image
-                #     image = x_cls[0]
-                #     image_name = f'selected/img{self.saved_cnt}.png'
-                #     save_image(image, image_name)
-                #     self.saved_cnt += 1
+                if self.image_cnt % 10000 == 0 and self.enable_image_save:
+                    image = trans(x_cls[0])
+                    image_name = f'check/img-{self.saved_cnt}-EvalSelected.png'
+                    image.save(image_name)
+                self.image_cnt += x_cls.shape[0] # add the batchsize
 
         assert x_cls.shape[1:] == self.orig_size
         x = self.resnet(x_cls)
