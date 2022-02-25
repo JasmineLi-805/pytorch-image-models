@@ -692,6 +692,9 @@ def train_one_epoch(
         with amp_autocast():
             output = model(input)
             loss = loss_fn(output, target)
+            
+            diff = output - target
+            accu = 1.0 - torch.count_nonzero(diff) / output.size()
 
         if not args.distributed:
             losses_m.update(loss.item(), input.size(0))
@@ -732,7 +735,8 @@ def train_one_epoch(
                     'Time: {batch_time.val:.3f}s, {rate:>7.2f}/s  '
                     '({batch_time.avg:.3f}s, {rate_avg:>7.2f}/s)  '
                     'LR: {lr:.3e}  '
-                    'Data: {data_time.val:.3f} ({data_time.avg:.3f})'.format(
+                    'Data: {data_time.val:.3f} ({data_time.avg:.3f})  '
+                    'Accuracy: {accu.val:.3f}'.format(
                         epoch,
                         batch_idx, len(loader),
                         100. * batch_idx / last_idx,
@@ -741,7 +745,8 @@ def train_one_epoch(
                         rate=input.size(0) * args.world_size / batch_time_m.val,
                         rate_avg=input.size(0) * args.world_size / batch_time_m.avg,
                         lr=lr,
-                        data_time=data_time_m))
+                        data_time=data_time_m,
+                        accu=accu))
 
                 if args.save_images and output_dir:
                     torchvision.utils.save_image(
