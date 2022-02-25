@@ -222,7 +222,7 @@ class SalienceImageDataset(ImageDataset):
         
         downsize_crop = self.downsize_transform(img)    # torch.Size([5, 1, 224, 224])
         if index % 10000 == 1:
-            for i in downsize_crop.shape[0]:
+            for i in range(downsize_crop.shape[0]):
                 toSave = trans(downsize_crop[i])
                 image_name = f'img{index}-5cropDown-{i}.png'
                 toSave.save(image_name)
@@ -230,7 +230,7 @@ class SalienceImageDataset(ImageDataset):
 
         original_crop = self.original_transform(img)    # torch.Size([5, 3, 224, 224])
         if index % 10000 == 1:
-            for i in original_crop.shape[0]:
+            for i in range(original_crop.shape[0]):
                 toSave = trans(original_crop[i])
                 image_name = f'img{index}-5cropOrig-{i}.png'
                 toSave.save(image_name)
