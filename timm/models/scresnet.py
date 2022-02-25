@@ -93,7 +93,7 @@ class ScResnet(nn.Module):
         self.is_training = True
         
         self.image_cnt = 0
-        self.enable_image_save = False
+        self.enable_image_save = True
 
 
     def forward(self, x):
