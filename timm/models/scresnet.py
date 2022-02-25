@@ -141,7 +141,7 @@ class ScResnet(nn.Module):
                 
                 if self.image_cnt % 10000 == 0 and self.enable_image_save:
                     image = trans(x_cls[0])
-                    image_name = f'check/img-{self.saved_cnt}-EvalSelected.png'
+                    image_name = f'check/img-{self.image_cnt}-EvalSelected.png'
                     image.save(image_name)
                 self.image_cnt += x_cls.shape[0] # add the batchsize
 
