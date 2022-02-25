@@ -111,13 +111,13 @@ class ScResnet(nn.Module):
         trans = transforms.ToPILImage()
         if self.image_cnt <= 10 and self.enable_image_save:
             for j in range(10):
-                greys = x_sc[0]
+                greys = x_sc[j]
                 for i in range(greys.shape[0]):
                     grey = trans(greys[i])
                     grey_name = f'check/img-{j}-unpack-grey-{i}.png'
                     grey.save(grey_name)
 
-                colors = x_cls[0]
+                colors = x_cls[j]
                 for i in range(colors.shape[0]):
                     color = trans(colors[i])
                     color_name = f'check/img-{j}-unpack-color-{i}.png'
