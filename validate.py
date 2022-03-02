@@ -174,7 +174,7 @@ def validate(args):
     if args.num_gpu > 1:
         model = torch.nn.DataParallel(model, device_ids=list(range(args.num_gpu)))
 
-    print(summary(model, (7,3,224,224)))
+    print(summary(model, (2,7,3,224,224)))
 
     criterion = nn.CrossEntropyLoss().cuda()
 
