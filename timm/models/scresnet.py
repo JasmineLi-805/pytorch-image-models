@@ -75,7 +75,6 @@ class ScLayer(nn.Module):
     def forward(self, x):
         # x: (batch, n_crop=1, chan=1, H, W)
         batch_size = x.shape[0]
-        print(f'x.shape={x.shape}')
         n = x.shape[1]
         x = x.view(batch_size * n, x.shape[2], x.shape[3], x.shape[4])
         x = self.blocks(x)
