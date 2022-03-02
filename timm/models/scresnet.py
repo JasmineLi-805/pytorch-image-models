@@ -91,7 +91,9 @@ class ScResnet(nn.Module):
 
         self.salience_map = ScLayer(SC_layers, self.down_size)
         print(downsample_size)
-        print(summary(self.salience_map, (2,1,self.down_size[0],self.down_size[1],self.down_size[2])))
+        map_input_shape = (2,1,self.down_size[0],self.down_size[1],self.down_size[2])
+        print(f'map input shape={map_input_shape}')
+        print(summary(self.salience_map, map_input_shape))
 
         self.resnet = create_model(classifier, in_chans=original_size[0])
 
