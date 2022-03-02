@@ -8,6 +8,8 @@ from .registry import register_model
 from .helpers import build_model_with_cfg
 from timm.data import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 from torchvision import transforms
+from torchsummary import summary
+
 
 # __all__ = ['ScResnet']  # model_registry will add each entrypoint fn to this
 
@@ -88,6 +90,8 @@ class ScResnet(nn.Module):
         self.num_classes=num_classes
 
         self.salience_map = ScLayer(SC_layers, self.down_size)
+        print(summary(self.salience_map, (2,1,1,self.down_size,self.down_size)))
+
         self.resnet = create_model(classifier, in_chans=original_size[0])
 
         self.is_training = True
