@@ -1,4 +1,5 @@
 import math
+from pickle import TRUE
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -10,6 +11,8 @@ from timm.data import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 from torchvision import transforms
 from torchsummary import summary
 
+
+PRINT_MODEL_SHAPE = True
 
 # __all__ = ['ScResnet']  # model_registry will add each entrypoint fn to this
 
@@ -91,10 +94,10 @@ class ScResnet(nn.Module):
         self.num_classes=num_classes
 
         self.salience_map = ScLayer(SC_layers, self.down_size)
-        print(downsample_size)
-        map_input_shape = (1, self.down_size[0], self.down_size[1], self.down_size[2])
-        print(f'map input shape={map_input_shape}')
-        print(summary(self.salience_map, map_input_shape))
+
+        if PRINT_MODEL_SHAPE:
+            map_input_shape = (1, self.down_size[0], self.down_size[1], self.down_size[2])
+            print(summary(self.salience_map, map_input_shape))
 
         self.resnet = create_model(classifier, in_chans=original_size[0])
 
@@ -129,7 +132,7 @@ class ScResnet(nn.Module):
                 colors = x_cls[j]
                 for i in range(colors.shape[0]):
                     color = trans(colors[i])
-                    color_name = f'check/img-{j}-color-{i}.png'
+                    color_name = f'check/img-{self.image_cnt*10 + j}-color-{i}.png'
                     color.save(color_name)
 
         x_sc = self.salience_map(x_sc)  # (batch, n_crop)
