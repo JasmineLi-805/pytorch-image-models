@@ -18,6 +18,7 @@ import torch.nn as nn
 import torch.nn.parallel
 from collections import OrderedDict
 from contextlib import suppress
+from torchsummary import summary
 
 from timm.models import create_model, apply_test_time_pool, load_checkpoint, is_model, list_models
 from timm.data import create_dataset, create_loader, resolve_data_config, RealLabelsImagenet
@@ -172,6 +173,8 @@ def validate(args):
 
     if args.num_gpu > 1:
         model = torch.nn.DataParallel(model, device_ids=list(range(args.num_gpu)))
+
+    print(summary(model, (7,3,224,224)))
 
     criterion = nn.CrossEntropyLoss().cuda()
 

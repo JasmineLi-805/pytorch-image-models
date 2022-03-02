@@ -115,7 +115,7 @@ class ScResnet(nn.Module):
                 greys = x_sc[j]
                 for i in range(greys.shape[0]):
                     grey = trans(greys[i])
-                    grey_name = f'check/img-{j}-grey-{i}.png'
+                    grey_name = f'check/img-{self.image_cnt*10 + j}-grey-{i}.png'
                     grey.save(grey_name)
 
                 colors = x_cls[j]
@@ -144,7 +144,7 @@ class ScResnet(nn.Module):
                 if self.image_cnt <= 2 and self.enable_image_save:
                     for i in range(10):
                         image = trans(x_cls[i])
-                        image_name = f'check/img-{i}-EvalSelected.png'
+                        image_name = f'check/img-{self.image_cnt*10 + i}-EvalSelected.png'
                         image.save(image_name)
         self.image_cnt += 1
         assert x_cls.shape[1:] == self.orig_size
