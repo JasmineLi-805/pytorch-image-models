@@ -1,5 +1,6 @@
 import math
 from pickle import TRUE
+from tabnanny import verbose
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -12,7 +13,7 @@ from torchvision import transforms
 from torchsummary import summary
 
 
-PRINT_MODEL_SHAPE = True
+PRINT_MODEL_SHAPE = False
 
 # __all__ = ['ScResnet']  # model_registry will add each entrypoint fn to this
 
@@ -103,7 +104,7 @@ class ScResnet(nn.Module):
         self.is_training = True
         
         self.image_cnt = 0
-        self.enable_image_save = True
+        self.enable_image_save = False
 
 
     def forward(self, x):
