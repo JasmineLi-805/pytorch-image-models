@@ -93,7 +93,7 @@ class ScResnet(nn.Module):
         self.is_training = True
         
         self.image_cnt = 0
-        self.enable_image_save = False
+        self.enable_image_save = True
 
 
     def forward(self, x):
@@ -110,18 +110,18 @@ class ScResnet(nn.Module):
         x_cls = torch.permute(x_cls, (1, 0, 2, 3, 4)) # (batch, n_crop, chan=3, H, W)
         
         trans = transforms.ToPILImage()
-        if self.image_cnt <= 10 and self.enable_image_save:
-            for j in range(5):
+        if self.image_cnt <= 2 and self.enable_image_save:
+            for j in range(10):
                 greys = x_sc[j]
                 for i in range(greys.shape[0]):
                     grey = trans(greys[i])
-                    grey_name = f'check/img-{j}-unpack-grey-{i}.png'
+                    grey_name = f'check/img-{j}-grey-{i}.png'
                     grey.save(grey_name)
 
                 colors = x_cls[j]
                 for i in range(colors.shape[0]):
                     color = trans(colors[i])
-                    color_name = f'check/img-{j}-unpack-color-{i}.png'
+                    color_name = f'check/img-{j}-color-{i}.png'
                     color.save(color_name)
 
         x_sc = self.salience_map(x_sc)  # (batch, n_crop)
@@ -141,13 +141,12 @@ class ScResnet(nn.Module):
                 x_cls = torch.gather(x_cls, dim=1, index=x_sc)
                 x_cls = torch.squeeze(x_cls)
                 
-                if self.image_cnt <= 10 and self.enable_image_save:
+                if self.image_cnt <= 2 and self.enable_image_save:
                     for i in range(10):
                         image = trans(x_cls[i])
                         image_name = f'check/img-{i}-EvalSelected.png'
                         image.save(image_name)
-                self.image_cnt += x_cls.shape[0] # add the batchsize
-
+        self.image_cnt += 1
         assert x_cls.shape[1:] == self.orig_size
         x = self.resnet(x_cls)
         return x

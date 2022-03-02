@@ -220,7 +220,7 @@ class SalienceImageDataset(ImageDataset):
         assert img.shape == (7,3,self.large_size, self.large_size) # (7,3,224,224)
 
         if index % 10000 == 1 and self.enable_img_save:
-            assert img.shape == (6, 4, self.large_size, self.large_size)
+            assert img.shape == (7, 3, self.large_size, self.large_size)
             for i in range(img.shape[0]):
                 color= trans(img[i][:3])
                 grey = trans(img[i][3])
