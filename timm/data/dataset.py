@@ -195,7 +195,7 @@ class SalienceImageDataset(ImageDataset):
             self.transform.transforms = self.transform.transforms[:-1]
         
         img, target = super().__getitem__(index)
-        if img.shape == (7, 3, self.large_size, self.large_size):
+        if img.shape == (7, 3, self.large_size, self.large_size) or img.shape == (6, 4, self.large_size, self.large_size):
             return img, target
         
         trans = transforms.ToPILImage()
@@ -205,19 +205,41 @@ class SalienceImageDataset(ImageDataset):
             img.save(image_name)
         
         ds_nocrop = self.downsize(img)
-        padding = torch.zeros((2, self.large_size, self.large_size))
-        ds_nocrop = torch.cat((ds_nocrop, padding), dim=0)
-        assert ds_nocrop.shape == (3, self.large_size, self.large_size)
-        ds_nocrop = torch.unsqueeze(ds_nocrop, 0)   # torch.Size([1, 3, 224, 224])
+        ds_nocrop = torch.unsqueeze(ds_nocrop, 0)   # torch.Size([1, 1, 224, 224])
 
         ori_nocrop = self.original(img)
         ori_nocrop = torch.unsqueeze(ori_nocrop, 0) # torch.Size([1, 3, 224, 224])
+        
+        downsize_crop = self.downsize_transform(img)    # torch.Size([5, 1, 224, 224])
+        downsize_crop = torch.cat((ds_nocrop, downsize_crop), dim=0)    # torch.Size([6, 1, 224, 224])
 
         original_crop = self.original_transform(img)    # torch.Size([5, 3, 224, 224])
         original_crop = torch.cat((ori_nocrop, original_crop), dim=0)   # torch.Size([6, 3, 224, 224])
 
-        img = torch.cat((ds_nocrop, original_crop), dim=0)
-        assert img.shape == (7,3,self.large_size, self.large_size) # (7,3,224,224)
+        downsize_crop = torch.permute(downsize_crop, (1, 0, 2, 3))
+        original_crop = torch.permute(original_crop, (1, 0, 2, 3))
+        img = torch.cat((original_crop,downsize_crop), dim=0)
+        img = torch.permute(img, (1, 0, 2, 3))
+        assert img.shape == (6, 4, self.large_size, self.large_size)
+
+        # ------------  single no-crop grey scale image -----------
+        # 
+        # ds_nocrop = self.downsize(img)
+        # padding = torch.zeros((2, self.large_size, self.large_size))
+        # ds_nocrop = torch.cat((ds_nocrop, padding), dim=0)
+        # assert ds_nocrop.shape == (3, self.large_size, self.large_size)
+        # ds_nocrop = torch.unsqueeze(ds_nocrop, 0)   # torch.Size([1, 3, 224, 224])
+
+        # ori_nocrop = self.original(img)
+        # ori_nocrop = torch.unsqueeze(ori_nocrop, 0) # torch.Size([1, 3, 224, 224])
+
+        # original_crop = self.original_transform(img)    # torch.Size([5, 3, 224, 224])
+        # original_crop = torch.cat((ori_nocrop, original_crop), dim=0)   # torch.Size([6, 3, 224, 224])
+
+        # img = torch.cat((ds_nocrop, original_crop), dim=0)
+        # assert img.shape == (7,3,self.large_size, self.large_size) # (7,3,224,224)
+        #
+        # ---------------------------------------------------------
 
         if index % 10000 == 1 and self.enable_img_save:
             assert img.shape == (7, 3, self.large_size, self.large_size)
