@@ -34,7 +34,7 @@ model_cfg = {
         [ 16, 32, 3, 2, 'relu6'],
         [ 32, 64, 3, 2, 'relu6']
     ],
-    'downsample_size': (1, 64, 64),
+    'downsample_size': (1, 128, 128),
     'original_size': (3, 224, 224),
     'num_classes': default_cfg['num_classes'],
     'classifier': 'resnet18'
@@ -100,7 +100,7 @@ class ScResnet(nn.Module):
         self.is_training = True
         
         self.image_cnt = 0
-        self.enable_image_save = True
+        self.enable_image_save = False
 
 
     def forward(self, x):
@@ -140,7 +140,7 @@ class ScResnet(nn.Module):
             with torch.no_grad():
                 # print(torch.sum(x_sc, dim=0) / x_sc.shape[0])
                 x_sc = torch.argmax(x_sc, dim=1)    # [batch_size,]
-                print(x_sc)
+                # print(x_sc)
                 x_sc = x_sc.unsqueeze(-1).unsqueeze(-1).unsqueeze(-1).unsqueeze(-1)
                 x_sc = x_sc.repeat(1, 1, self.orig_size[0], self.orig_size[1], self.orig_size[2])
                 x_cls = torch.gather(x_cls, dim=1, index=x_sc)
