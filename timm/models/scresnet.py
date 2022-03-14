@@ -142,7 +142,7 @@ class ScResnet(nn.Module):
 
                 # force no selection
                 device = torch.device('cuda:0')
-                x_sc = torch.randint(low=0, high=6, size=x_sc.shape)
+                x_sc = torch.randint(low=0, high=6, size=x_sc.shape, device=device)
 
                 x_sc = x_sc.unsqueeze(-1).unsqueeze(-1).unsqueeze(-1).unsqueeze(-1)
                 x_sc = x_sc.repeat(1, 1, self.orig_size[0], self.orig_size[1], self.orig_size[2])
