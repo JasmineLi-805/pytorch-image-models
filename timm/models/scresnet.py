@@ -142,7 +142,6 @@ class ScResnet(nn.Module):
 
                 # force no selection
                 x_sc = 0 * x_sc
-                print(x_sc)
 
                 x_sc = x_sc.unsqueeze(-1).unsqueeze(-1).unsqueeze(-1).unsqueeze(-1)
                 x_sc = x_sc.repeat(1, 1, self.orig_size[0], self.orig_size[1], self.orig_size[2])
