@@ -141,84 +141,9 @@ class ScResnet(nn.Module):
                 x_sc = torch.argmax(x_sc, dim=1)    # [batch_size,]
 
                 # force no selection
-                x_sc = torch.zeros(x_sc.shape)
+                x_sc = 0 * x_sc
                 print(x_sc)
 
-                x_sc = x_sc.unsqueeze(-1).unsqueeze(-1).unsqueeze(-1).unsqueeze(-1)
-                x_sc = x_sc.repeat(1, 1, self.orig_size[0], self.orig_size[1], self.orig_size[2])
-                x_cls = torch.gather(x_cls, dim=1, index=x_sc)
-                x_cls = torch.squeeze(x_cls)
-                
-                if self.image_cnt <= 2 and self.enable_image_save:
-                    for i in range(10):
-                        image = trans(x_cls[i])
-                        image_name = f'check/img-{self.image_cnt*10 + i}-EvalSelected.png'
-                        image.save(image_name)
-        self.image_cnt += 1
-        assert x_cls.shape[1:] == self.orig_size
-        x = self.resnet(x_cls)
-        return x
-
-class ScResnet_SingleGrey(nn.Module):
-    def __init__(self, original_size, downsample_size, SC_layers,
-                 classifier='resnet18', num_classes=1000, in_chans=4) -> None:
-        super().__init__()
-        self.down_size = downsample_size
-        self.orig_size = original_size
-        self.num_classes=num_classes
-
-        self.salience_map = ScLayer(SC_layers, self.down_size)
-
-        if PRINT_MODEL_SHAPE:
-            map_input_shape = (1, self.down_size[0], self.down_size[1], self.down_size[2])
-            print(summary(self.salience_map, map_input_shape))
-
-        self.resnet = create_model(classifier, in_chans=original_size[0])
-
-        self.is_training = True
-        
-        self.image_cnt = 0
-        self.enable_image_save = False
-
-
-    def forward(self, x):
-        # x -> (batch, 5_crop(5)+orig(1)+grey(1), chan=3, H, W)
-        x = torch.permute(x, (1, 0, 2, 3, 4))
-        assert x.shape[0] == 7
-        x_sc = x[0].unsqueeze(dim=0)     # (n_crop=1, batch, chan=3, H, W)
-        x_cls = x[1:]   # (n_crop=6, batch, chan=3, H, W)
-        x_sc = torch.permute(x_sc, (1, 0, 2, 3, 4)) # (batch, n_crop=1, chan=3, H, W)
-        x_sc = x_sc[:, :, :self.down_size[0], :self.down_size[1], :self.down_size[2]]   # remove the padded region (batch, n_crop=1, chan=1, H, W)
-        assert x_sc.shape == (x_sc.shape[0], 1, 1, self.down_size[1], self.down_size[2])
-        x_cls = torch.permute(x_cls, (1, 0, 2, 3, 4)) # (batch, n_crop, chan=3, H, W)
-        
-        trans = transforms.ToPILImage()
-        if self.image_cnt <= 2 and self.enable_image_save:
-            for j in range(10):
-                greys = x_sc[j]
-                for i in range(greys.shape[0]):
-                    grey = trans(greys[i])
-                    grey_name = f'check/img-{self.image_cnt*10 + j}-grey-{i}.png'
-                    grey.save(grey_name)
-
-                colors = x_cls[j]
-                for i in range(colors.shape[0]):
-                    color = trans(colors[i])
-                    color_name = f'check/img-{self.image_cnt*10 + j}-color-{i}.png'
-                    color.save(color_name)
-
-        x_sc = self.salience_map(x_sc)  # (batch, n_crop)
-        if self.training:
-            # print('train')
-            x_sc = x_sc.view(x_sc.shape[0], x_sc.shape[1], 1, 1, 1)
-            x_cls = x_cls * x_sc
-            x_cls = torch.sum(x_cls, dim=1)
-        else:
-            # print('eval'))
-            with torch.no_grad():
-                # print(torch.sum(x_sc, dim=0) / x_sc.shape[0])
-                x_sc = torch.argmax(x_sc, dim=1)    # [batch_size,]
-                # print(x_sc)
                 x_sc = x_sc.unsqueeze(-1).unsqueeze(-1).unsqueeze(-1).unsqueeze(-1)
                 x_sc = x_sc.repeat(1, 1, self.orig_size[0], self.orig_size[1], self.orig_size[2])
                 x_cls = torch.gather(x_cls, dim=1, index=x_sc)
