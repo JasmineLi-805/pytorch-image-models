@@ -95,7 +95,9 @@ class ScResnet(nn.Module):
         self.num_classes=num_classes
 
         self.salience_map = ScLayer(SC_layers, self.down_size)
-        self.resnet = create_model(classifier, in_chans=original_size[0])
+        self.resnet = create_model(classifier, in_chans=original_size[0], pretrained=True)
+        for param in self.resnet.parameters():
+            param.requires_grad = False
 
         self.is_training = True
         
@@ -141,8 +143,8 @@ class ScResnet(nn.Module):
                 x_sc = torch.argmax(x_sc, dim=1)    # [batch_size,]
 
                 # force no selection
-                device = torch.device('cuda:0')
-                x_sc = torch.randint(low=0, high=6, size=x_sc.shape, device=device)
+                # device = torch.device('cuda:0')
+                # x_sc = torch.randint(low=0, high=6, size=x_sc.shape, device=device)
 
                 x_sc = x_sc.unsqueeze(-1).unsqueeze(-1).unsqueeze(-1).unsqueeze(-1)
                 x_sc = x_sc.repeat(1, 1, self.orig_size[0], self.orig_size[1], self.orig_size[2])
