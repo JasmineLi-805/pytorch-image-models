@@ -95,7 +95,7 @@ class ScResnet(nn.Module):
         self.num_classes=num_classes
 
         self.salience_map = ScLayer(SC_layers, self.down_size)
-        self.resnet = create_model(classifier, in_chans=original_size[0], pretrained=True)
+        self.resnet = create_model(classifier, in_chans=original_size[0], pretrained=False)
         # freeze resnet18 weights
         # for param in self.resnet.parameters():
         #     param.requires_grad = False
