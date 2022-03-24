@@ -229,7 +229,7 @@ def validate(args):
             print(input.shape)
             batch_size = input.shape[0]
             n_crop = input.shape[1]
-            input = torch.view(batch_size * n_crop, 1, -1)
+            input = input.view(batch_size * n_crop, 1, -1)
             print(input.shape)
             # --
 
@@ -239,7 +239,7 @@ def validate(args):
 
             # --
             print(f'new output shape={output.shape}, first n_crop pred={output[:6]}')
-            output = torch.view(batch_size, n_crop)
+            output = output.view(batch_size, n_crop)
             output = output[:][0]
             print(f'reduced output shape={output.shape}, first pred={output[0]}')
             # --
