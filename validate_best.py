@@ -111,6 +111,16 @@ parser.add_argument('--real-labels', default='', type=str, metavar='FILENAME',
 parser.add_argument('--valid-labels', default='', type=str, metavar='FILENAME',
                     help='Valid label indices txt file for validation of partial label space')
 
+def best_accuracy(output, target):
+    assert len(target) == output.shape[0]
+    correct = 0
+    total = output.shape[0]
+    for pred, targ in zip(output, target):
+        if targ in pred:
+            correct += 1
+    return correct * 1.0 / total
+
+
 
 def validate(args):
     # might as well try to validate something
@@ -239,26 +249,20 @@ def validate(args):
 
             # --
             print(f'new output shape={output.shape}, first n_crop pred={output[:6]}')
+            output = torch.argmax(output, dim=1)
             output = output.view(batch_size, n_crop)
-            output = output[:][0]
             print(f'reduced output shape={output.shape}, first pred={output[0]}')
             # --
 
             if valid_labels is not None:
                 output = output[:, valid_labels]
 
-            # TODO: Process output here using the correct ans.
-
-            loss = criterion(output, target)
-
             if real_labels is not None:
                 real_labels.add_result(output)
 
             # measure accuracy and record loss
-            acc1, acc5 = accuracy(output.detach(), target, topk=(1, 5))
-            losses.update(loss.item(), input.size(0))
-            top1.update(acc1.item(), input.size(0))
-            top5.update(acc5.item(), input.size(0))
+            acc1 = best_accuracy(output.detach(), target)
+            top1.update(acc1.item(), output.size(0))
 
             # measure elapsed time
             batch_time.update(time.time() - end)
@@ -268,12 +272,9 @@ def validate(args):
                 _logger.info(
                     'Test: [{0:>4d}/{1}]  '
                     'Time: {batch_time.val:.3f}s ({batch_time.avg:.3f}s, {rate_avg:>7.2f}/s)  '
-                    'Loss: {loss.val:>7.4f} ({loss.avg:>6.4f})  '
-                    'Acc@1: {top1.val:>7.3f} ({top1.avg:>7.3f})  '
-                    'Acc@5: {top5.val:>7.3f} ({top5.avg:>7.3f})'.format(
+                    'Acc@1: {top1.val:>7.3f} ({top1.avg:>7.3f})  '.format(
                         batch_idx, len(loader), batch_time=batch_time,
-                        rate_avg=input.size(0) / batch_time.avg,
-                        loss=losses, top1=top1, top5=top5))
+                        rate_avg=input.size(0) / batch_time.avg, top1=top1))
 
     if real_labels is not None:
         # real labels mode replaces topk values at the end
@@ -282,14 +283,13 @@ def validate(args):
         top1a, top5a = top1.avg, top5.avg
     results = OrderedDict(
         top1=round(top1a, 4), top1_err=round(100 - top1a, 4),
-        top5=round(top5a, 4), top5_err=round(100 - top5a, 4),
         param_count=round(param_count / 1e6, 2),
         img_size=data_config['input_size'][-1],
         cropt_pct=crop_pct,
         interpolation=data_config['interpolation'])
 
-    _logger.info(' * Acc@1 {:.3f} ({:.3f}) Acc@5 {:.3f} ({:.3f})'.format(
-       results['top1'], results['top1_err'], results['top5'], results['top5_err']))
+    _logger.info(' * Acc@1 {:.3f} ({:.3f})'.format(
+       results['top1'], results['top1_err']))
 
     return results
 
