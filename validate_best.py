@@ -236,11 +236,11 @@ def validate(args):
                 input = input.contiguous(memory_format=torch.channels_last)
 
             # --
-            print(input.shape)
+            print(f'initial input shape={input.shape}')
             batch_size = input.shape[0]
             n_crop = input.shape[1]
             input = input.view(batch_size * n_crop, 1, input.shape[2], input.shape[3], input.shape[4])
-            print(input.shape)
+            print(f'modified input shape={input.shape}')
             # --
 
             # compute output
@@ -248,8 +248,8 @@ def validate(args):
                 output = model(input)
 
             # --
-            print(f'new output shape={output.shape}, first n_crop pred={output[:6]}')
             output = torch.argmax(output, dim=1)
+            print(f'new output shape={output.shape}, first n_crop pred={output[:6]}')
             output = output.view(batch_size, n_crop)
             print(f'reduced output shape={output.shape}, first pred={output[0]}')
             # --
@@ -262,7 +262,7 @@ def validate(args):
 
             # measure accuracy and record loss
             acc1 = best_accuracy(output.detach(), target)
-            top1.update(acc1.item(), output.size(0))
+            top1.update(acc1, output.size(0))
 
             # measure elapsed time
             batch_time.update(time.time() - end)
