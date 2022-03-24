@@ -236,11 +236,11 @@ def validate(args):
                 input = input.contiguous(memory_format=torch.channels_last)
 
             # --
-            print(f'initial input shape={input.shape}')
+            # print(f'initial input shape={input.shape}')
             batch_size = input.shape[0]
             n_crop = input.shape[1]
             input = input.view(batch_size * n_crop, 1, input.shape[2], input.shape[3], input.shape[4])
-            print(f'modified input shape={input.shape}')
+            # print(f'modified input shape={input.shape}')
             # --
 
             # compute output
@@ -249,9 +249,9 @@ def validate(args):
 
             # --
             output = torch.argmax(output, dim=1)
-            print(f'new output shape={output.shape}, first n_crop pred={output[:6]}')
+            # print(f'new output shape={output.shape}, first n_crop pred={output[:6]}')
             output = output.view(batch_size, n_crop)
-            print(f'reduced output shape={output.shape}, first pred={output[0]}')
+            # print(f'reduced output shape={output.shape}, first pred={output[0]}')
             # --
 
             if valid_labels is not None:
