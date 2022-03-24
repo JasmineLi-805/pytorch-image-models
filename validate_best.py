@@ -282,7 +282,7 @@ def validate(args):
     else:
         top1a, top5a = top1.avg, top5.avg
     results = OrderedDict(
-        top1=round(top1a, 4), top1_err=round(100 - top1a, 4),
+        top1=round(top1a, 4), top1_err=round(1.0 - top1a, 4),
         param_count=round(param_count / 1e6, 2),
         img_size=data_config['input_size'][-1],
         cropt_pct=crop_pct,
