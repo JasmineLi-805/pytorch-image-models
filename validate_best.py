@@ -229,7 +229,7 @@ def validate(args):
             print(input.shape)
             batch_size = input.shape[0]
             n_crop = input.shape[1]
-            input = input.view(batch_size * n_crop, 1, -1)
+            input = input.view(batch_size * n_crop, 1, input.shape[2], input.shape[3], input.shape[4])
             print(input.shape)
             # --
 
