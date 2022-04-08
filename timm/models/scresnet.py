@@ -37,7 +37,7 @@ model_cfg = {
     'downsample_size': (1, 128, 128),
     'original_size': (3, 224, 224),
     'num_classes': default_cfg['num_classes'],
-    'classifier': 'resnet18'
+    'classifier': 'resnet50'
 }
 
 def calc_conv_out_dim(in_dim, kernel, stride):
@@ -88,7 +88,7 @@ class ScLayer(nn.Module):
 
 class ScResnet(nn.Module):
     def __init__(self, original_size, downsample_size, SC_layers,
-                 classifier='resnet50', num_classes=1000, in_chans=4) -> None:
+                 classifier='resnet18', num_classes=1000, in_chans=4) -> None:
         super().__init__()
         self.down_size = downsample_size
         self.orig_size = original_size
